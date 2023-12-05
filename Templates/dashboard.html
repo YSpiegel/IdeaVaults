@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+<div class="container text-center">
+    <h1 style="text-align: left;">{{greeting}}, {{user}}</h1>
+    <br>
+    <div class="row align-items-start">
+        <div class="col">
+            <div class="card" style="width: 18rem;">
+                <img src="./static/vault.png" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <h5 class="card-title">My vaults</h5>
+                        <p class="card-text">Your most secret and private projects, kept in vaults only you can access.</p>
+                        <a href="#" class="btn btn-primary">Enter</a>
+                    </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card" style="width: 18rem;">
+                <img src="./static/vault.png" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <h5 class="card-title">Shared vaults</h5>
+                        <p class="card-text">The vaults you share with others or others share with you, the space of collaboration here.</p>
+                        <a href="#" class="btn btn-primary">Enter</a>
+                    </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card" style="width: 18rem;">
+                <img src="./static/stat2.png" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <h5 class="card-title">Statistics</h5>
+                        <p class="card-text">Check out interesting information about your usage and experience so far in the site.</p>
+                        <a href="#" class="btn btn-primary">Enter</a>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

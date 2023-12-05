@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+<div class="container text-center">
+  <div class="row align-items-start">
+    <div class="col">
+      <label for="sign-in" class="h1">If you already have an account:</label>
+        <div id="sign-in" class="card text-center">
+          <img src="./static/key.png" class="card-img-top mx-auto"  style="width: 18rem; ">
+          <div class="card-body">
+            <h5 class="card-title">Sign In</h5>
+            <form method="POST">
+              <br>
+              <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="floatingInput" placeholder="name@example.com" name="identifier">
+                <label for="floatingInput">Name or Email</label>
+              </div>
+              <div class="form-floating">
+                <input type="password" class="form-control" id="floatingPassword" placeholder="Password" name="password">
+                <label for="floatingPassword">Password</label>
+              </div>
+              <button type="submit" class="btn btn-primary mt-5">Submit</button>
+            </form>
+            <br>
+            <h3 style="color: red">{{errortext | default('')}}</h3>
+          </div>
+        </div>
+    </div>
+    <div class="col">
+      <label for="sign-up" class="h1">Don't have one?</label>
+      <div id="sign-up" class="card text-center">
+        <img src="./static/vault.png" class="card-img-top mx-auto"  style="width: 18rem; ">
+        <div class="card-body">
+          <h5 class="card-title">Sign Up</h5>
+          <p class="card-text">Join the safest community of visionaries and keep your ideas secured with us here in IdeaVaults</p>
+          <a href="/sign-up" class="btn btn-primary">Let's begin</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

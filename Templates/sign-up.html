@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+<div class="container text-center">
+  <div class="row align-items-center">
+    <div class="col">
+      <form id="signup" method="POST">
+        <h2>Create an Account</h2>
+
+        <div class="form-floating mb-3">
+          <input type="text" class="form-control" name="name" id="name" placeholder="Name">
+          <label for="name">Name</label>
+        </div>
+
+        <div class="form-floating mb-3">
+          <input type="email" class="form-control" name="email" id="email" placeholder="Email">
+          <label for="email">Email</label>
+        </div>
+
+        <div class="form-floating mb-3">
+          <input type="password" class="form-control" name="password" id="password" placeholder="Password">
+          <label for="password">Password</label>
+        </div>
+
+        <div class="form-floating">
+          <input type="password" class="form-control" name="confirm" id="confirm" placeholder="Confirm Password">
+          <label for="confirm">Confirm Password</label>
+        </div>
+      </form>
+      <br>
+      <h3 style="color: red">{{errortext | default('')}}</h3>
+    </div>
+    <div class="col">
+      <button type="submit" class="btn btn-primary" form="signup">Create</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
