@@ -26,7 +26,7 @@ def sign_in(identifier, password):
         obj = users.find_one({method(identifier): identifier})
         if obj and obj['password'] == password:
             return obj['name']
-        return ''
+        return '@'
 
 
 def add_ip(name, ip):

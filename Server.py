@@ -3,7 +3,7 @@ import threading
 import DBHandle
 import re
 
-IP = "192.168.1.113"
+IP = "172.20.140.27"
 PORT = 5900
 
 
@@ -12,7 +12,7 @@ def adduser(data, client):
     name, email, password = data.split(":")
     new_name = DBHandle.check_if_new(name)
     new_email = DBHandle.check_if_new(email)
-    valid_name = re.match(r'^[a-zA-Z0-9_]{4,20}$', name) != None
+    valid_name = re.match(r'^[a-zA-Z0-9_ ]{4,20}$', name) != None
 
     client.send(f"{new_name}:{new_email}:{valid_name}".encode())
     if new_name and new_email and valid_name:

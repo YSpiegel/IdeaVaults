@@ -6,7 +6,7 @@ import socket
 
 app = Flask(__name__)
 
-IP = "192.168.1.113"
+IP = "172.20.140.27"
 PORT = 5900
 
 
@@ -40,8 +40,7 @@ def home():
 def connect():
     user = get_user(request.remote_addr)
     if user:
-        redirect(url_for('dashboard'))
-        return
+        return redirect(url_for('dashboard'))
 
     if request.method == 'POST':
         identifier = request.form['identifier']
@@ -54,7 +53,7 @@ def connect():
         name = client_socket.recv(1024).decode()
         client_socket.close()
 
-        if name:
+        if name != '@':
             client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             client_socket.connect((IP, PORT))
             client_socket.send(f"register-user;{name}:{request.remote_addr}".encode())
@@ -70,8 +69,7 @@ def connect():
 def signup():
     user = get_user(request.remote_addr)
     if user:
-        redirect(url_for('dashboard'))
-        return
+        return redirect(url_for('dashboard'))
 
     if request.method == 'POST':
         name = request.form['name']
