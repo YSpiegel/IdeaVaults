@@ -6,7 +6,7 @@ import socket
 app = Flask(__name__)
 
 IP = "127.0.0.1"
-PORT = 5900
+PORT = 6010
 
 
 def get_user(remote_addr):
