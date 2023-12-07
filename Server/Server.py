@@ -1,9 +1,8 @@
 import socket
-import threading
 import DBHandle
 import re
 
-IP = "172.20.140.27"
+IP = "127.0.0.1"
 PORT = 5900
 
 

@@ -1,4 +1,3 @@
-import threading
 import utils
 
 from flask import Flask, render_template, request, url_for, redirect
@@ -6,7 +5,7 @@ import socket
 
 app = Flask(__name__)
 
-IP = "172.20.140.27"
+IP = "127.0.0.1"
 PORT = 5900
 
 
