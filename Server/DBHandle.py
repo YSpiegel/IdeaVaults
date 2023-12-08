@@ -14,6 +14,16 @@ def check_if_new(identifier):
         return not exists
 
 
+def check_if_connected(name):
+    with MongoClient(uri) as cluster:
+        users = cluster['IdeaVaults']['Users']
+        user = users.find_one({"name": name})
+        try:
+            return bool(user['ip'])
+        except:
+            return False
+
+
 def add_new(name, email, password):
     with MongoClient(uri) as cluster:
         users = cluster['IdeaVaults']['Users']

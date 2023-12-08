@@ -6,7 +6,6 @@ IP = "127.0.0.1"
 PORT = 6010
 
 
-
 def adduser(data, client):
     name, email, password = data.split(":")
     new_name = DBHandle.check_if_new(name)
@@ -26,7 +25,10 @@ def sign_in(data, client):
 
 def register_user(data, client):
     name, ip = data.split(":")
-    DBHandle.add_ip(name, ip)
+    already_connected = DBHandle.check_if_connected(name)
+    if not already_connected:
+        DBHandle.add_ip(name, ip)
+    client.send(str(already_connected).encode())
 
 
 def search_addr(data, client):
@@ -64,4 +66,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-    #search_addr("127.0.0.1", 1)
+    # search_addr("127.0.0.1", 1)

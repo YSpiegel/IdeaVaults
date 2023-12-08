@@ -56,8 +56,11 @@ def connect():
             client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             client_socket.connect((IP, PORT))
             client_socket.send(f"register-user;{name}:{request.remote_addr}".encode())
+            already_connected = client_socket.recv(1024).decode()
             client_socket.close()
-            return redirect(url_for('dashboard'))
+            if already_connected == "False":
+                return redirect(url_for('dashboard'))
+            return render_template('connect.html', errortext="The user is already connected somewhere else")
 
         return render_template('connect.html', errortext="Wrong information, try again")
 
