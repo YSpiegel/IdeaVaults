@@ -7,6 +7,13 @@ PORT = 6010
 
 
 def adduser(data, client):
+    """
+    Tries to add a new user to the db
+    If is unique and valid, user is added
+    :param data: New User info
+    :param client: Client object
+    :return:
+    """
     name, email, password = data.split(":")
     new_name = DBHandle.check_if_new(name)
     new_email = DBHandle.check_if_new(email)
@@ -18,12 +25,26 @@ def adduser(data, client):
 
 
 def sign_in(data, client):
+    """
+    Tries to sign in a user to the system
+    and sends back the user's name
+    If unable to, sends back '@' as name
+    :param data: User identifier and password
+    :param client: Client object
+    :return:
+    """
     identifier, password = data.split(":")
     name = DBHandle.sign_in(identifier, password)
     client.send(name.encode())
 
 
 def register_user(data, client):
+    """
+    Registers an entry of a user to the system
+    :param data: Username and IP
+    :param client: Client object
+    :return:
+    """
     name, ip = data.split(":")
     already_connected = DBHandle.check_if_connected(name)
     if not already_connected:
@@ -32,6 +53,12 @@ def register_user(data, client):
 
 
 def search_addr(data, client):
+    """
+    Looks for a user that's already connected
+    :param data: User IP
+    :param client: Client object
+    :return:
+    """
     user = DBHandle.find_by_addr(data)
     if user:
         client.send(user['name'].encode())
@@ -40,6 +67,12 @@ def search_addr(data, client):
 
 
 def remove_ip(data, client):
+    """
+    Disconnects a user by removing the IP field
+    :param data: User to disconnect
+    :param client: Client object
+    :return:
+    """
     ip_address = data
     user = DBHandle.find_by_addr(ip_address)
     if user:

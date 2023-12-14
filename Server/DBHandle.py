@@ -1,16 +1,17 @@
 from pymongo import MongoClient
+import crypt
 
 uri = "mongodb+srv://yoavsp:y0avdb7@cluster1.jebb6i6.mongodb.net/?retryWrites=true&w=majority"
 
 
-def method(identifier):
+def sign_in_method(identifier):
     return 'email' if "@" in identifier else 'name'
 
 
 def check_if_new(identifier):
     with MongoClient(uri) as cluster:
         users = cluster['IdeaVaults']['Users']
-        exists = bool(users.find_one({method(identifier): identifier}))
+        exists = bool(users.find_one({sign_in_method(identifier): identifier}))
         return not exists
 
 
@@ -33,7 +34,7 @@ def add_new(name, email, password):
 def sign_in(identifier, password):
     with MongoClient(uri) as cluster:
         users = cluster['IdeaVaults']['Users']
-        obj = users.find_one({method(identifier): identifier})
+        obj = users.find_one({sign_in_method(identifier): identifier})
         if obj and obj['password'] == password:
             return obj['name']
         return '@'
