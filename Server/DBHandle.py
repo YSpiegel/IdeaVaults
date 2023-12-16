@@ -28,14 +28,14 @@ def check_if_connected(name):
 def add_new(name, email, password):
     with MongoClient(uri) as cluster:
         users = cluster['IdeaVaults']['Users']
-        users.insert_one({"name":name, "email":email, "password":crypt.md5hash(password)})
+        users.insert_one({"name":name, "email":email, "password":crypt.rblhash(password)})
 
 
 def sign_in(identifier, password):
     with MongoClient(uri) as cluster:
         users = cluster['IdeaVaults']['Users']
         obj = users.find_one({sign_in_method(identifier): identifier})
-        if obj and obj['password'] == crypt.md5hash(password):
+        if obj and obj['password'] == crypt.rblhash(password):
             return obj['name']
         return '@'
 
