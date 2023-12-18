@@ -1,5 +1,4 @@
 from pymongo import MongoClient
-import crypt
 
 uri = "mongodb+srv://yoavsp:y0avdb7@cluster1.jebb6i6.mongodb.net/?retryWrites=true&w=majority"
 
@@ -28,14 +27,14 @@ def check_if_connected(name):
 def add_new(name, email, password):
     with MongoClient(uri) as cluster:
         users = cluster['IdeaVaults']['Users']
-        users.insert_one({"name":name, "email":email, "password":crypt.rblhash(password)})
+        users.insert_one({"name":name, "email":email, "password":password})
 
 
 def sign_in(identifier, password):
     with MongoClient(uri) as cluster:
         users = cluster['IdeaVaults']['Users']
         obj = users.find_one({sign_in_method(identifier): identifier})
-        if obj and obj['password'] == crypt.rblhash(password):
+        if obj and obj['password'] == password:
             return obj['name']
         return '@'
 

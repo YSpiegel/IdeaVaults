@@ -1,4 +1,4 @@
-import utils
+import utils, crypt
 
 from flask import Flask, render_template, request, url_for, redirect
 import socket
@@ -43,7 +43,7 @@ def connect():
 
     if request.method == 'POST':
         identifier = request.form['identifier']
-        password = request.form['password']
+        password = crypt.rblhash(request.form['password'])
 
         info = ":".join([identifier, password])
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -81,7 +81,7 @@ def signup():
         errortext = ""
 
         if password == confirm_password:
-            info = ":".join([name, email, password])
+            info = ":".join([name, email, crypt.rblhash(password)])
             client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             client_socket.connect((IP, PORT))
             client_socket.send(f"adduser;{info}".encode())
