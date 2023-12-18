@@ -120,7 +120,7 @@ def dashboard():
 
 @app.route('/my-vaults')
 def myvaults():
-    return render_template('my-vaults.html')
+    return render_template('my-vaults.html', user=get_user(request.remote_addr))
 
 
 @app.route("/sign-out")
