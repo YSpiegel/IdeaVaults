@@ -6,36 +6,18 @@
 <div class="container">
     <div id="carouselExample" class="carousel slide">
         <div class="carousel-inner">
-            <div class="carousel-item active">
+            {% for vault in vaults %}
+            <div class="carousel-item {% if loop.first %}active{% endif %}">
                 <div class="card" style="width: 18rem;">
                     <img src="./static/vault.png" class="card-img-top" alt="...">
                         <div class="card-body">
-                            <h5 class="card-title">Vault1</h5>
+                            <h5 class="card-title">{{ vault }}</h5>
                             <p class="card-text">Your most secret and private projects, kept in vaults only you can access.</p>
                             <a href="/my-vaults" class="btn btn-primary">Enter</a>
                         </div>
                 </div>
             </div>
-            <div class="carousel-item">
-                <div class="card" style="width: 18rem;">
-                    <img src="./static/vault.png" class="card-img-top" alt="...">
-                        <div class="card-body">
-                            <h5 class="card-title">Vault2</h5>
-                            <p class="card-text">Your most secret and private projects, kept in vaults only you can access.</p>
-                            <a href="/my-vaults" class="btn btn-primary">Enter</a>
-                        </div>
-                </div>
-            </div>
-            <div class="carousel-item">
-                <div class="card" style="width: 18rem;">
-                    <img src="./static/vault.png" class="card-img-top" alt="...">
-                        <div class="card-body">
-                            <h5 class="card-title">Vault3</h5>
-                            <p class="card-text">Your most secret and private projects, kept in vaults only you can access.</p>
-                            <a href="/my-vaults" class="btn btn-primary">Enter</a>
-                        </div>
-                </div>
-            </div>
+            {% endfor %}
         </div>
         <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
