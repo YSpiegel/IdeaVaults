@@ -79,10 +79,16 @@ def remove_ip(data, client):
 
 
 def get_private_vaults(data, client):
+    """
+    Passes all private vaults of a certain user
+    :param data: User
+    :param client: Client object
+    :return:
+    """
     pvaults = DBHandle.get_private_vaults(data)
     print(pvaults)
     for vault in pvaults:
-        obj = ObjManagement.Vault(vault['name'], vault['user'])
+        obj = ObjManagement.Vault(vault['name'], vault['user'], vault['description'])
         print(str(obj))
         client.send(str(obj).encode())
     client.send('@'.encode())
