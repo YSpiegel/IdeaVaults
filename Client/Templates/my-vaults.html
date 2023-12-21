@@ -21,7 +21,7 @@
                 </div>
             </div>
             {% endfor %}
-            <div class="carousel-item">
+            <div class="carousel-item {% if not vaults %}active{% endif %}">
                 <div class="d-flex justify-content-center">
                     <div class="card" style="width: 18rem;">
                         <img src="./static/vault.png" class="card-img-top" alt="...">

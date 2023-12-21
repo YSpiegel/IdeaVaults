@@ -3,7 +3,6 @@ import utils, crypt
 
 from flask import Flask, render_template, request, url_for, redirect
 import socket
-from ast import literal_eval
 
 app = Flask(__name__)
 
@@ -30,12 +29,9 @@ def get_private_vaults(user):
     while vault_str != "@":
         vault = ObjManagement.fromstr(vault_str)
         vaults.append(vault)
-        print(vault)
         vault_str = client_socket.recv(1024).decode()
-    print(vaults)
     client_socket.close()
-
-    return vaults if vaults != '@' else ""
+    return vaults
 
 
 user = ""
@@ -106,7 +102,6 @@ def signup():
             client_socket.send(f"adduser;{info}".encode())
             new_name, new_email, valid_name = client_socket.recv(1024).decode().split(":")
             client_socket.close()
-            print('socket closed')
 
             if new_name == "True" and new_email == "True":
                 if valid_name == "True":

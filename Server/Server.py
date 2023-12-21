@@ -86,10 +86,8 @@ def get_private_vaults(data, client):
     :return:
     """
     pvaults = DBHandle.get_private_vaults(data)
-    print(pvaults)
     for vault in pvaults:
         obj = ObjManagement.Vault(vault['name'], vault['user'], vault['description'])
-        print(str(obj))
         client.send(str(obj).encode())
     client.send('@'.encode())
 
