@@ -1,6 +1,5 @@
-import socket
-import DBHandle
-import re
+import socket ,re
+import DBHandle, ObjManagement
 
 IP = "127.0.0.1"
 PORT = 6010
@@ -79,11 +78,22 @@ def remove_ip(data, client):
         DBHandle.remove_ip(user['name'])
 
 
+def get_private_vaults(data, client):
+    pvaults = DBHandle.get_private_vaults(data)
+    print(pvaults)
+    for vault in pvaults:
+        obj = ObjManagement.Vault(vault['name'], vault['user'])
+        print(str(obj))
+        client.send(str(obj).encode())
+    client.send('@'.encode())
+
+
 actions = {"adduser": adduser,
            "sign-in": sign_in,
            "register-user": register_user,
            "get-user-by-addr": search_addr,
-           "remove-ip": remove_ip}
+           "remove-ip": remove_ip,
+           "get-private-vaults": get_private_vaults}
 
 
 def main():

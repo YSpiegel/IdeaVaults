@@ -1,7 +1,9 @@
+import ObjManagement
 import utils, crypt
 
 from flask import Flask, render_template, request, url_for, redirect
 import socket
+from ast import literal_eval
 
 app = Flask(__name__)
 
@@ -17,6 +19,23 @@ def get_user(remote_addr):
     client_socket.close()
 
     return user if user != '@' else ""
+
+
+def get_private_vaults(user):
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect((IP, PORT))
+    client_socket.send(f"get-private-vaults;{user}".encode())
+    vault_str = client_socket.recv(1024).decode()
+    vaults = []
+    while vault_str != "@":
+        vault = ObjManagement.fromstr(vault_str)
+        vaults.append(vault)
+        print(vault)
+        vault_str = client_socket.recv(1024).decode()
+    print(vaults)
+    client_socket.close()
+
+    return vaults if vaults != '@' else ""
 
 
 user = ""
@@ -120,7 +139,8 @@ def dashboard():
 
 @app.route('/my-vaults')
 def myvaults():
-    return render_template('my-vaults.html', user=get_user(request.remote_addr), vaults=["Vault1", "Vault2", "Vault3"])
+    user = get_user(request.remote_addr)
+    return render_template('my-vaults.html', user=user, vaults=get_private_vaults(user))
 
 
 @app.route("/sign-out")

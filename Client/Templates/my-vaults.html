@@ -3,29 +3,30 @@
 {% block title %}{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div id="carouselExample" class="carousel slide">
+<div class="container justify-content-center">
+    <h1>{{ user }}'s private vaults</h1>
+    <div id="vaultscarousel" class="carousel slide">
         <div class="carousel-inner">
             {% for vault in vaults %}
             <div class="carousel-item {% if loop.first %}active{% endif %}">
-                <div class="card" style="width: 18rem;">
-                    <img src="./static/vault.png" class="card-img-top" alt="...">
+                <div class="d-flex justify-content-center">
+                    <div class="card" style="width: 18rem;">
+                        <img src="./static/vault.png" class="card-img-top" alt="...">
                         <div class="card-body">
-                            <h5 class="card-title">{{ vault }}</h5>
+                            <h5 class="card-title">{{ vault.name }}</h5>
                             <p class="card-text">Your most secret and private projects, kept in vaults only you can access.</p>
                             <a href="/my-vaults" class="btn btn-primary">Enter</a>
                         </div>
+                    </div>
                 </div>
             </div>
             {% endfor %}
         </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
+        <button class="carousel-control-prev" type="button" style="color: navy" data-bs-target="#vaultscarousel" data-bs-slide="prev">
+            Previous
         </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
+        <button class="carousel-control-next" style="color: navy" type="button" data-bs-target="#vaultscarousel" data-bs-slide="next">
+            Next
         </button>
     </div>
 </div>

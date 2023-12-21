@@ -57,5 +57,11 @@ def remove_ip(name):
         users.update_one({'name': name}, {"$unset": {"ip": ""}})
 
 
+def get_private_vaults(user):
+    with MongoClient(uri) as cluster:
+        pvaults = cluster['IdeaVaults']['PVaults']
+        return list(pvaults.find({'user': user}))
+
+
 if __name__ == "__main__":
     print(bool("False"))
