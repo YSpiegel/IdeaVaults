@@ -92,12 +92,27 @@ def get_private_vaults(data, client):
     client.send('@'.encode())
 
 
+def get_shared_vaults(data, client):
+    """
+    Passes all shared vaults of a certain user
+    :param data: User
+    :param client: Client object
+    :return:
+    """
+    pvaults = DBHandle.get_shared_vaults(data)
+    for vault in pvaults:
+        obj = ObjManagement.Vault(vault['name'], vault['user'], vault['description'])
+        client.send(str(obj).encode())
+    client.send('@'.encode())
+
+
 actions = {"adduser": adduser,
            "sign-in": sign_in,
            "register-user": register_user,
            "get-user-by-addr": search_addr,
            "remove-ip": remove_ip,
-           "get-private-vaults": get_private_vaults}
+           "get-private-vaults": get_private_vaults,
+           "get-shared-vaults": get_shared_vaults}
 
 
 def main():

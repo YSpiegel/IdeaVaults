@@ -20,10 +20,10 @@ def get_user(remote_addr):
     return user if user != '@' else ""
 
 
-def get_private_vaults(user):
+def get_vaults(user, type):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((IP, PORT))
-    client_socket.send(f"get-private-vaults;{user}".encode())
+    client_socket.send(f"get-{type}-vaults;{user}".encode())
     vault_str = client_socket.recv(1024).decode()
     vaults = []
     while vault_str != "@":
@@ -133,9 +133,15 @@ def dashboard():
 
 
 @app.route('/my-vaults')
-def myvaults():
+def my_vaults():
     user = get_user(request.remote_addr)
-    return render_template('my-vaults.html', user=user, vaults=get_private_vaults(user))
+    return render_template('vaults-hub.html', type="private", user=user, vaults=get_vaults(user, "private"))
+
+
+@app.route('/shared-vaults')
+def shared_vaults():
+    user = get_user(request.remote_addr)
+    return render_template('vaults-hub.html', type="shared", user=user, vaults=get_vaults(user, "shared"))
 
 
 @app.route("/sign-out")

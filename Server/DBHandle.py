@@ -59,8 +59,14 @@ def remove_ip(name):
 
 def get_private_vaults(user):
     with MongoClient(uri) as cluster:
-        pvaults = cluster['IdeaVaults']['PVaults']
-        return list(pvaults.find({'user': user}))
+        vaults = cluster['IdeaVaults']['Vaults']
+        return list(vaults.find({'user': user, 'type': "private"}))
+
+
+def get_shared_vaults(user):
+    with MongoClient(uri) as cluster:
+        vaults = cluster['IdeaVaults']['Vaults']
+        return list(vaults.find({'user': user, 'type': "shared"}))
 
 
 if __name__ == "__main__":
