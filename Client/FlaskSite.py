@@ -1,7 +1,7 @@
 import ObjManagement
 import utils, crypt
 
-from flask import Flask, render_template, request, url_for, redirect
+from flask import Flask, render_template, request, url_for, redirect, send_from_directory
 import socket
 
 app = Flask(__name__)
@@ -32,6 +32,11 @@ def get_vaults(user, type):
         vault_str = client_socket.recv(1024).decode()
     client_socket.close()
     return vaults
+
+
+@app.route('/static/<path:filepath>')
+def serve_static(filepath):
+    return send_from_directory('static', filepath)
 
 
 user = ""
@@ -132,16 +137,22 @@ def dashboard():
     return render_template('dashboard.html', user=get_user(request.remote_addr), greeting=utils.get_greeting())
 
 
-@app.route('/my-vaults')
-def my_vaults():
+@app.route('/<type>-vaults')
+def vaults_hub(type):
     user = get_user(request.remote_addr)
-    return render_template('vaults-hub.html', type="private", user=user, vaults=get_vaults(user, "private"))
+    return render_template('vaults-hub.html', type=type, user=user, vaults=get_vaults(user, type))
 
 
-@app.route('/shared-vaults')
-def shared_vaults():
+@app.route('/<type>-vaults/new')
+def new_vault(type):
     user = get_user(request.remote_addr)
-    return render_template('vaults-hub.html', type="shared", user=user, vaults=get_vaults(user, "shared"))
+    return render_template('new-vault.html', type=type, user=user)
+
+
+@app.route('/private-vaults/<vault>')
+def vault_page(vault):
+    user = get_user(request.remote_addr)
+    return render_template('vault-page.html', user=user)
 
 
 @app.route("/sign-out")
