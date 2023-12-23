@@ -87,7 +87,7 @@ def get_private_vaults(data, client):
     """
     pvaults = DBHandle.get_private_vaults(data)
     for vault in pvaults:
-        obj = ObjManagement.Vault(vault['name'], vault['user'], vault['description'])
+        obj = ObjManagement.Vault(vault['title'], vault['user'], vault['description'])
         client.send(str(obj).encode())
     client.send('@'.encode())
 
@@ -101,7 +101,7 @@ def get_shared_vaults(data, client):
     """
     pvaults = DBHandle.get_shared_vaults(data)
     for vault in pvaults:
-        obj = ObjManagement.Vault(vault['name'], vault['user'], vault['description'])
+        obj = ObjManagement.Vault(vault['title'], vault['user'], vault['description'])
         client.send(str(obj).encode())
     client.send('@'.encode())
 

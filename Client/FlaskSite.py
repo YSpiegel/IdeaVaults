@@ -143,15 +143,14 @@ def vaults_hub(type):
     return render_template('vaults-hub.html', type=type, user=user, vaults=get_vaults(user, type))
 
 
-@app.route('/<type>-vaults/new')
-def new_vault(type):
+@app.route('/new-vault', methods=['GET', 'POST'])
+def new_vault():
     user = get_user(request.remote_addr)
-    return render_template('new-vault.html', type=type, user=user)
+    return render_template('new-vault.html', user=user)
 
 
-@app.route('/private-vaults/<vault>')
-def vault_page(vault):
-    user = get_user(request.remote_addr)
+@app.route('/<type>-vaults/<vault>')
+def vault_page(type, vault):
     return render_template('vault-page.html', user=user)
 
 
