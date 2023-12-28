@@ -11,4 +11,6 @@ class Vault:
 
 
 def fromstr(str):
+    print(str)
+    print(str.split("|||"))
     return Vault(*str.split("|||"))

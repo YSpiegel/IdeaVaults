@@ -90,6 +90,9 @@ def get_private_vaults(data, client):
     for vault in pvaults:
         vault_obj = obj.Vault(vault['title'], vault['user'], vault['description'], vault['type'])
         client.send(str(vault_obj).encode())
+        confirm = client.recv(1024).decode()
+        if confirm != "next":
+            return
     client.send('@'.encode())
 
 

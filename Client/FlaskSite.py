@@ -27,8 +27,10 @@ def get_vaults(user, type):
     vault_str = client_socket.recv(1024).decode()
     vaults = []
     while vault_str != "@":
+        print(obj.fromstr(vault_str))
         vault = obj.fromstr(vault_str)
         vaults.append(vault)
+        client_socket.send("next".encode())
         vault_str = client_socket.recv(1024).decode()
     client_socket.close()
     return vaults
@@ -158,8 +160,8 @@ def new_vault():
         description = request.form['description']
         need_to_choose_type = False
         if not type:
-            is_private = request.form['isprivate']
-            is_shared = request.form['isshared']
+            is_private = request.form['private']
+            is_shared = request.form['shared']
             need_to_choose_type = not is_shared and not is_private
             type = "private" if is_private else "shared"
 
