@@ -52,6 +52,12 @@ def find_by_addr(addr):
         return users.find_one({'ip':addr})
 
 
+def find_by_title(title):
+    with MongoClient(uri) as cluster:
+        users = cluster['IdeaVaults']['Vaults']
+        return users.find_one({'title':title})
+
+
 def remove_ip(name):
     with MongoClient(uri) as cluster:
         users = cluster['IdeaVaults']['Users']

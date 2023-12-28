@@ -1,4 +1,4 @@
-import socket ,re
+import socket, re
 import DBHandle
 import ObjManagement as obj
 
@@ -65,6 +65,18 @@ def search_addr(data, client):
     else:
         client.send("@".encode())
 
+def search_vault(data, client):
+    """
+    Looks for a vault by its title
+    :param data: Vault title
+    :param client: Client object
+    :return:
+    """
+    vault = DBHandle.find_by_title(data)
+    if vault:
+        client.send(str(obj.Vault(vault['title'], vault['user'], vault['description'], vault['type'])).encode())
+    else:
+        client.send("@".encode())
 
 def remove_ip(data, client):
     """
@@ -107,6 +119,9 @@ def get_shared_vaults(data, client):
     for vault in pvaults:
         vault_obj = obj.Vault(vault['title'], vault['user'], vault['description'], vault['type'])
         client.send(str(vault_obj).encode())
+        confirm = client.recv(1024).decode()
+        if confirm != "next":
+            return
     client.send('@'.encode())
 
 
@@ -132,7 +147,8 @@ actions = {"adduser": adduser,
            "remove-ip": remove_ip,
            "get-private-vaults": get_private_vaults,
            "get-shared-vaults": get_shared_vaults,
-           "add-vault": add_vault}
+           "add-vault": add_vault,
+           "get-vault-by-title": search_vault}
 
 
 def main():

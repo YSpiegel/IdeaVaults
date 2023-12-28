@@ -19,6 +19,15 @@ def get_user(remote_addr):
 
     return user if user != '@' else ""
 
+def get_vault(title):
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect((IP, PORT))
+    client_socket.send(f"get-vault-by-title;{title}".encode())
+    vault = obj.fromstr(client_socket.recv(1024).decode())
+    client_socket.close()
+
+    return user if vault != '@' else ""
+
 
 def get_vaults(user, type):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -188,7 +197,9 @@ def new_vault():
 
 @app.route('/<type>-vaults/<vault>')
 def vault_page(type, vault):
-    return render_template('vault-page.html', user=user)
+    user = get_user(request.remote_addr)
+    vault = get_vault(vault)
+    return render_template('vault-page.html', user=user, vault=vault)
 
 
 @app.route("/sign-out")
