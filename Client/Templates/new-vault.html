@@ -9,20 +9,21 @@
 
         <div class="input-group mb-3">
             <span class="input-group-text">User</span>
-            <input id="user" type="text" class="form-control" placeholder="{{user}}" aria-label="user" aria-describedby="basic-addon1" disabled>
+            <input id="user" type="text" class="form-control" placeholder="{{user}}" aria-label="user"
+                   aria-describedby="basic-addon1" disabled>
         </div>
 
 
         <div class="input-group mb-3">
             <span class="input-group-text" id="basic-addon1">Title</span>
-            <input id="title" type="text" class="form-control" placeholder="Name your vault" aria-label="title" aria-describedby="basic-addon1">
+            <input name="title" type="text" class="form-control" placeholder="Name your vault" aria-label="title" aria-describedby="basic-addon1">
         </div>
 
         <div class="input-group">
             <span class="input-group-text">Description</span>
-            <textarea id="description" class="form-control" aria-label="With textarea"></textarea>
+            <textarea name="description" class="form-control" aria-label="With textarea"></textarea>
         </div>
-
+        {% if not type %}
         <div class="container">
             <div class="form-check form-check-inline">
                 <input class="form-check-input" type="radio" name="private" id="private" value="isprivate">
@@ -33,8 +34,10 @@
                 <label class="form-check-label" for="shared">Shared</label>
             </div>
         </div>
+        {% endif %}
     </form>
-    <button type="submit" class="btn btn-primary" form="newvault">Create</button>
+    <h3 style="color: red">{{errortext | default('')}}</h3>
+    <button type="submit" class="btn btn-primary mt-4" form="newvault">Create</button>
 </div>
 
 {% endblock %}

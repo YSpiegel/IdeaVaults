@@ -1,5 +1,6 @@
 import socket ,re
-import DBHandle, ObjManagement
+import DBHandle
+import ObjManagement as obj
 
 IP = "127.0.0.1"
 PORT = 6010
@@ -87,8 +88,8 @@ def get_private_vaults(data, client):
     """
     pvaults = DBHandle.get_private_vaults(data)
     for vault in pvaults:
-        obj = ObjManagement.Vault(vault['title'], vault['user'], vault['description'])
-        client.send(str(obj).encode())
+        vault_obj = obj.Vault(vault['title'], vault['user'], vault['description'], vault['type'])
+        client.send(str(vault_obj).encode())
     client.send('@'.encode())
 
 
@@ -101,9 +102,24 @@ def get_shared_vaults(data, client):
     """
     pvaults = DBHandle.get_shared_vaults(data)
     for vault in pvaults:
-        obj = ObjManagement.Vault(vault['title'], vault['user'], vault['description'])
-        client.send(str(obj).encode())
+        vault_obj = obj.Vault(vault['title'], vault['user'], vault['description'], vault['type'])
+        client.send(str(vault_obj).encode())
     client.send('@'.encode())
+
+
+def add_vault(data, client):
+    """
+    Create a new vault for a client
+    :param data: vault string obj
+    :param client: Client Object
+    :return:
+    """
+    vault = obj.fromstr(data)
+    if not DBHandle.check_if_new_vault(vault.title, vault.user):
+        client.send("ChangeTitle".encode())
+
+    DBHandle.add_vault(vault)
+    client.send("OK".encode())
 
 
 actions = {"adduser": adduser,
@@ -112,7 +128,8 @@ actions = {"adduser": adduser,
            "get-user-by-addr": search_addr,
            "remove-ip": remove_ip,
            "get-private-vaults": get_private_vaults,
-           "get-shared-vaults": get_shared_vaults}
+           "get-shared-vaults": get_shared_vaults,
+           "add-vault": add_vault}
 
 
 def main():

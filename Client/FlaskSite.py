@@ -1,4 +1,4 @@
-import ObjManagement
+import ObjManagement as obj
 import utils, crypt
 
 from flask import Flask, render_template, request, url_for, redirect, send_from_directory
@@ -27,7 +27,7 @@ def get_vaults(user, type):
     vault_str = client_socket.recv(1024).decode()
     vaults = []
     while vault_str != "@":
-        vault = ObjManagement.fromstr(vault_str)
+        vault = obj.fromstr(vault_str)
         vaults.append(vault)
         vault_str = client_socket.recv(1024).decode()
     client_socket.close()
@@ -143,10 +143,46 @@ def vaults_hub(type):
     return render_template('vaults-hub.html', type=type, user=user, vaults=get_vaults(user, type))
 
 
+@app.route('/new-vault/<type>')
+def redirect_new_vault(type):
+    return redirect(url_for('new_vault', type=type))
+
+
 @app.route('/new-vault', methods=['GET', 'POST'])
 def new_vault():
     user = get_user(request.remote_addr)
-    return render_template('new-vault.html', user=user)
+    type = request.args.get('type')
+
+    if request.method == "POST":
+        title = request.form['title']
+        description = request.form['description']
+        need_to_choose_type = False
+        if not type:
+            is_private = request.form['isprivate']
+            is_shared = request.form['isshared']
+            need_to_choose_type = not is_shared and not is_private
+            type = "private" if is_private else "shared"
+
+        if need_to_choose_type:
+            return render_template('new-vault.html', user=user, errortext="Choose type")
+
+        if not title or not description:
+            return render_template('new-vault.html', user=user, errortext="Missing information")
+
+        vault = obj.Vault(title, user, description, type)
+
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client_socket.connect((IP, PORT))
+        client_socket.send(f"add-vault;{str(vault)}".encode())
+        feedback = client_socket.recv(1024).decode()
+        client_socket.close()
+
+        if feedback == "ChangeTitle":
+            return render_template('new-vault.html', user=user, errortext="Title already taken")
+
+        return redirect(url_for('vault_page', type=type, vault=title))
+
+    return render_template('new-vault.html', user=user, type=type)
 
 
 @app.route('/<type>-vaults/<vault>')

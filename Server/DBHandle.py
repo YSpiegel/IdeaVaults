@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+import ObjManagement as obj
 
 uri = "mongodb+srv://yoavsp:y0avdb7@cluster1.jebb6i6.mongodb.net/?retryWrites=true&w=majority"
 
@@ -68,6 +69,20 @@ def get_shared_vaults(user):
         vaults = cluster['IdeaVaults']['Vaults']
         return list(vaults.find({'user': user, 'type': "shared"}))
 
+
+def check_if_new_vault(vault_title, user):
+    with MongoClient(uri) as cluster:
+        vaults = cluster['IdeaVaults']['Vaults']
+        exists = bool(vaults.find_one({'title': vault_title,
+                                      'user': user}))
+        return not exists
+
+
+def add_vault(vault):
+    with MongoClient(uri) as cluster:
+        vaults = cluster['IdeaVaults']['Vaults']
+        vaults.insert_one({'title': vault.title, 'description': vault.description,
+                           'user': vault.user, 'type': vault.type})
 
 if __name__ == "__main__":
     print(bool("False"))
