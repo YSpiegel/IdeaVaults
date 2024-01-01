@@ -19,14 +19,13 @@ def get_user(remote_addr):
 
     return user if user != '@' else ""
 
+
 def get_vault(title):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((IP, PORT))
     client_socket.send(f"get-vault-by-title;{title}".encode())
     vault = obj.fromstr(client_socket.recv(1024).decode())
-    client_socket.close()
-
-    return user if vault != '@' else ""
+    return vault if vault != '@' else ""
 
 
 def get_vaults(user, type):
