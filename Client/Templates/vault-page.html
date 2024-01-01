@@ -4,9 +4,43 @@
 
 {% block content %}
 <div class="container justify-content-center">
-    <h2>{{vault.title}}</h2>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    </nav>
+    <h2 style="text-align: center">{{vault.title}}</h2>
+    <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light" id="vault-navbar">
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 justify-content-center">
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">
+                        Description</a></li>
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">
+                        Add New Gem</a></li>
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">
+                        Search the vault</a></li>
+                    {% if vault.type == "private" %}
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">
+                        Make public</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
+    </div>
 </div>
+<script>
+  const nav = document.getElementById('vault-navbar');
+  const navItems = nav.querySelectorAll('li');
 
+  function spreadItems() {
+    const navWidth = nav.offsetWidth;
+    const itemCount = navItems.length;
+    const itemWidth = navWidth / itemCount;
+
+    navItems.forEach(item => {
+      item.style.width = `${itemWidth}px`;
+      item.style.textAlign = 'center';
+    });
+  }
+
+  spreadItems();
+
+  window.addEventListener('resize', spreadItems);
+</script>
 {% endblock %}
