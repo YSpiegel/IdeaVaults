@@ -6,7 +6,7 @@
 <div class="container justify-content-center">
     <h2 style="text-align: center">{{vault.title}}</h2>
     <div class="container-fluid">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light" id="vault-navbar">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light mt-3" id="vault-navbar">
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0 justify-content-center">
                     <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">
@@ -14,10 +14,15 @@
                     <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">
                         Add New Gem</a></li>
                     <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">
-                        Search the vault</a></li>
+                        Search The Vault</a></li>
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">
+                        Filter contents</a></li>
                     {% if vault.type == "private" %}
                     <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">
-                        Make public</a></li>
+                        Make Public</a></li>
+                    {% else %}
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">
+                        Produce Shared Key</a></li>
                     {% endif %}
                 </ul>
             </div>

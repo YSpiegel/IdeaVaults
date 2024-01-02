@@ -90,5 +90,6 @@ def add_vault(vault):
         vaults.insert_one({'title': vault.title, 'description': vault.description,
                            'user': vault.user, 'type': vault.type})
 
+
 if __name__ == "__main__":
     print(bool("False"))

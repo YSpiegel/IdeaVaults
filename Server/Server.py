@@ -1,9 +1,10 @@
 import socket, re
 import DBHandle
 import ObjManagement as obj
+import threading as th
 
 IP = "127.0.0.1"
-PORT = 6010
+PORT = 7891
 
 
 def adduser(data, client):
@@ -140,15 +141,18 @@ def add_vault(data, client):
     client.send("OK".encode())
 
 
-actions = {"adduser": adduser,
-           "sign-in": sign_in,
-           "register-user": register_user,
-           "get-user-by-addr": search_addr,
-           "remove-ip": remove_ip,
-           "get-private-vaults": get_private_vaults,
-           "get-shared-vaults": get_shared_vaults,
-           "add-vault": add_vault,
-           "get-vault-by-title": search_vault}
+def act(action, data, client):
+    actions = {"adduser": adduser,
+               "sign-in": sign_in,
+               "register-user": register_user,
+               "get-user-by-addr": search_addr,
+               "remove-ip": remove_ip,
+               "get-private-vaults": get_private_vaults,
+               "get-shared-vaults": get_shared_vaults,
+               "add-vault": add_vault,
+               "get-vault-by-title": search_vault}
+
+    actions[action](data, client)
 
 
 def main():
@@ -159,7 +163,8 @@ def main():
     while True:
         client, ip = server_socket.accept()
         action, data = client.recv(1024).decode().split(';')
-        actions[action](data, client)
+        thread = th.Thread(target=act, args=(action, data, client))
+        thread.start()
 
 
 if __name__ == "__main__":
