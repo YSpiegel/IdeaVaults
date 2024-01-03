@@ -9,9 +9,10 @@
         <nav class="navbar navbar-expand-lg navbar-light bg-light mt-3" id="vault-navbar">
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0 justify-content-center">
-                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href=""
+                                            data-bs-toggle="modal" data-bs-target="#descriptionModal">
                         Description</a></li>
-                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="#" id="newgemlink">
                         Add New Gem</a></li>
                     <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">
                         Search The Vault</a></li>
@@ -29,6 +30,75 @@
         </nav>
     </div>
 </div>
+<div class="modal fade"  id="descriptionModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Vault's description</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST">
+                    <input type="text" class="form-control" id="description" name="description" value="{{vault.description}}">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="updateButton" class="btn btn-primary"
+                        data-bs-dismiss="modal" disabled>Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!---
+<script>
+const modal = bootstrap.Modal(document.getElementById('descriptionModal'));
+
+modal.addEventListener('shown.bs.modal', () => {
+
+    const new = document.getElementById('newgemlink');
+    new.disabled = true;
+
+});
+</script>
+--->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('descriptionModal');
+
+    modal.addEventListener('hidden.bs.modal', () => {
+
+        const updatedDesc = document.getElementById('description').value;
+
+        fetch('./update-description', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                vaultTitle: '{{vault.title}}',
+                description: updatedDesc
+            })
+        });
+        .then(response => {
+            if(response.ok){
+              document.getElementById('vaultDescription').innerText = updatedDesc;
+            }
+
+    });
+});
+</script>
+<script>
+const description = document.getElementById('description');
+const updateButton = document.getElementById('updateButton');
+
+description.addEventListener('input', () => {
+  if(description.value !== "{{vault.description}}" && description.value.length > 0) {
+    updateButton.disabled = false;
+  } else {
+    updateButton.disabled = true;
+  }
+});
+</script>
 <script>
   const nav = document.getElementById('vault-navbar');
   const navItems = nav.querySelectorAll('li');

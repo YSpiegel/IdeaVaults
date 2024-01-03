@@ -1,7 +1,7 @@
 import ObjManagement as obj
 import utils, crypt
 
-from flask import Flask, render_template, request, url_for, redirect, send_from_directory
+from flask import Flask, render_template, request, url_for, redirect, send_from_directory, jsonify
 import socket
 
 app = Flask(__name__)
@@ -199,6 +199,22 @@ def vault_page(type, vault):
     user = get_user(request.remote_addr)
     vault = get_vault(vault)
     return render_template('vault-page.html', user=user, vault=vault)
+
+
+@app.route('/<type>-vaults/update-description', methods=['POST'])
+def update_description(type):
+    data = request.get_json()
+    user = get_user(request.remote_addr)
+
+    title = data['vaultTitle']
+    new_desc = data['description']
+
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect((IP, PORT))
+    client_socket.send(f"update-vault-desc;{user}:{title}:{new_desc}".encode())
+    client_socket.close()
+
+    return '', 200
 
 
 @app.route("/sign-out")

@@ -141,6 +141,12 @@ def add_vault(data, client):
     client.send("OK".encode())
 
 
+def update_description(data, client):
+    print(f'Reached with {data}')
+    vault = DBHandle.update_description(*data.split(":"))
+    #client.send(str(obj.Vault(vault['title'], vault['user'], vault['description'], vault['type'])))
+
+
 def act(action, data, client):
     actions = {"adduser": adduser,
                "sign-in": sign_in,
@@ -150,7 +156,8 @@ def act(action, data, client):
                "get-private-vaults": get_private_vaults,
                "get-shared-vaults": get_shared_vaults,
                "add-vault": add_vault,
-               "get-vault-by-title": search_vault}
+               "get-vault-by-title": search_vault,
+               "update-vault-desc": update_description}
 
     actions[action](data, client)
 

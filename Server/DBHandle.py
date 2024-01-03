@@ -91,5 +91,13 @@ def add_vault(vault):
                            'user': vault.user, 'type': vault.type})
 
 
+def update_description(user, title, description):
+    print(f'Reached with {user} {title} {description}')
+    with MongoClient(uri) as cluster:
+        vaults = cluster['IdeaVaults']['Vaults']
+        vaults.update_one({'user':user, 'title':title}, {'$set':{'description':description}})
+        return vaults.find_one({'user':user, 'title':title})
+
+
 if __name__ == "__main__":
     print(bool("False"))
