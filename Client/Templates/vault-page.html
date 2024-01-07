@@ -43,7 +43,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="exampleModalLabel">Vault's description</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" id="closeUpdate" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form method="POST">
@@ -74,11 +74,9 @@ modal.addEventListener('shown.bs.modal', () => {
 const description = document.getElementById('description');
 const updateButton = document.getElementById('updateButton');
 
-document.addEventListener('DOMContentLoaded', () => {
+const closeUpdate = document.getElementById('closeUpdate');
 
-  const modal = document.getElementById('descriptionModal');
-
-  modal.addEventListener('hidden.bs.modal', () => {
+updateButton.addEventListener('click', () => {
     const updatedDesc = document.getElementById('description').value;
 
     fetch('/update-description', {
@@ -98,7 +96,26 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log('Error:', error);
     });
   });
-});
+
+  closeUpdate.addEventListener('click', () => {
+    fetch('/check-description', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        vaultTitle: '{{vault.title}}'
+      })
+    })
+    .then(response => response.text())
+        .then(data => {
+      description.value = data;
+      updateButton.disabled = true;
+    })
+    .catch(error => {
+      console.log('Error:', error);
+    });
+  });
 
 description.addEventListener('input', () => {
     fetch('/check-description', {
