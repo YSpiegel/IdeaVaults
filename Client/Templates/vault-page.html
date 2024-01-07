@@ -31,6 +31,18 @@
     </div>
     {% for gem in gems %}
     <div class="card m-3" style="width: 18rem;">
+        <div class="card-header">
+            <nav class="navbar bg-body-tertiary">
+                <!--
+                <div class="container-fluid" style="display: flex; justify-content: space-between;">
+                    <button><img src="/static/dupicon.png" style="width: 10%"></button>
+                    <button><img src="/static/dupicon.png" style="width: 10%"></button>
+                    <button><img src="/static/dupicon.png" style="width: 10%"></button>
+                    <button><img src="/static/dupicon.png" style="width: 10%"></button>
+                </div>
+                -->
+            </nav>
+        </div>
       <div class="card-body">
         <h5 class="card-title">{{gem.title}}</h5>
         <p class="card-text">{{gem.content}}</p>
