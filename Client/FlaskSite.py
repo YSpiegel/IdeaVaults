@@ -24,8 +24,24 @@ def get_vault(title):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((IP, PORT))
     client_socket.send(f"get-vault-by-title;{title}".encode())
-    vault = obj.fromstr(client_socket.recv(1024).decode())
+    vault = obj.vaultfromstr(client_socket.recv(1024).decode())
     return vault if vault != '@' else ""
+
+
+def get_vault_gems(vault):
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect((IP, PORT))
+    client_socket.send(f"get-gems-by-vault;{vault.title}:{vault.user}".encode())
+    gem_str = client_socket.recv(1024).decode()
+    gems = []
+    while gem_str != "@":
+        #print(gem_str)
+        gem = obj.gemfromstr(gem_str)
+        gems.append(gem)
+        client_socket.send("next".encode())
+        gem_str = client_socket.recv(1024).decode()
+    client_socket.close()
+    return gems
 
 
 def get_vaults(user, type):
@@ -35,7 +51,7 @@ def get_vaults(user, type):
     vault_str = client_socket.recv(1024).decode()
     vaults = []
     while vault_str != "@":
-        vault = obj.fromstr(vault_str)
+        vault = obj.vaultfromstr(vault_str)
         vaults.append(vault)
         client_socket.send("next".encode())
         vault_str = client_socket.recv(1024).decode()
@@ -198,7 +214,8 @@ def new_vault():
 def vault_page(type, vault):
     user = get_user(request.remote_addr)
     vault = get_vault(vault)
-    return render_template('vault-page.html', user=user, vault=vault)
+    gems = get_vault_gems(vault)
+    return render_template('vault-page.html', user=user, vault=vault, gems=gems)
 
 
 @app.route('/update-description', methods=['POST'])

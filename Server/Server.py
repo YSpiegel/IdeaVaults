@@ -116,8 +116,8 @@ def get_shared_vaults(data, client):
     :param client: Client object
     :return:
     """
-    pvaults = DBHandle.get_shared_vaults(data)
-    for vault in pvaults:
+    svaults = DBHandle.get_shared_vaults(data)
+    for vault in svaults:
         vault_obj = obj.Vault(vault['title'], vault['user'], vault['description'], vault['type'])
         client.send(str(vault_obj).encode())
         confirm = client.recv(1024).decode()
@@ -133,7 +133,7 @@ def add_vault(data, client):
     :param client: Client Object
     :return:
     """
-    vault = obj.fromstr(data)
+    vault = obj.vaultfromstr(data)
     if not DBHandle.check_if_new_vault(vault.title, vault.user):
         client.send("ChangeTitle".encode())
 
@@ -153,6 +153,18 @@ def get_desc(data, client):
     client.send(vault['description'].encode())
 
 
+def gems_by_vault(data, client):
+    vault, user = data.split(":")
+    gems = DBHandle.get_gems(vault, user)
+    for gem in gems:
+        gem_obj = obj.Gem(gem['vault'], gem['user'], gem['title'], gem['content'])
+        client.send(str(gem_obj).encode())
+        confirm = client.recv(1024).decode()
+        if confirm != "next":
+            return
+    client.send('@'.encode())
+
+
 def act(action, data, client):
     actions = {"adduser": adduser,
                "sign-in": sign_in,
@@ -164,7 +176,8 @@ def act(action, data, client):
                "add-vault": add_vault,
                "get-vault-by-title": search_vault,
                "update-vault-desc": update_description,
-               "find-desc": get_desc}
+               "find-desc": get_desc,
+               "get-gems-by-vault": gems_by_vault}
 
     actions[action](data, client)
 

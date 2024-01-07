@@ -92,7 +92,6 @@ def add_vault(vault):
 
 
 def update_description(user, title, description):
-    print(f'Reached with {user} {title} {description}')
     with MongoClient(uri) as cluster:
         vaults = cluster['IdeaVaults']['Vaults']
         vaults.update_one({'user':user, 'title':title}, {'$set':{'description':description}})
@@ -100,10 +99,15 @@ def update_description(user, title, description):
 
 
 def get_vault(user, title):
-    print(f'Reached with {user} {title}')
     with MongoClient(uri) as cluster:
         vaults = cluster['IdeaVaults']['Vaults']
         return vaults.find_one({'user':user, 'title':title})
+
+
+def get_gems(vault, user):
+    with MongoClient(uri) as cluster:
+        gems = cluster['IdeaVaults']['Gems']
+        return list(gems.find({'vault': vault, 'user': user}))
 
 
 if __name__ == "__main__":
