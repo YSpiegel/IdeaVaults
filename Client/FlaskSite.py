@@ -201,11 +201,10 @@ def vault_page(type, vault):
     return render_template('vault-page.html', user=user, vault=vault)
 
 
-@app.route('/<type>-vaults/update-description', methods=['POST'])
-def update_description(type):
+@app.route('/update-description', methods=['POST'])
+def update_description():
     data = request.get_json()
     user = get_user(request.remote_addr)
-
     title = data['vaultTitle']
     new_desc = data['description']
 
@@ -215,6 +214,21 @@ def update_description(type):
     client_socket.close()
 
     return '', 200
+
+
+@app.route('/check-description', methods=['POST'])
+def check_description():
+    data = request.get_json()
+    user = get_user(request.remote_addr)
+    title = data['vaultTitle']
+
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect((IP, PORT))
+    client_socket.send(f"find-desc;{user}:{title}".encode())
+    desc = client_socket.recv(1024).decode()
+    client_socket.close()
+
+    return desc
 
 
 @app.route("/sign-out")
