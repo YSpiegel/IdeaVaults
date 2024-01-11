@@ -248,6 +248,21 @@ def check_description():
     return desc
 
 
+@app.route('/delete-gem', methods=['POST'])
+def delete_gem():
+    data = request.get_json()
+    user = get_user(request.remote_addr)
+    gem = data['gemTitle']
+    vault = data['vaultTitle']
+
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect((IP, PORT))
+    client_socket.send(f"delete-gem-from-vault;{vault}:{gem}".encode())
+    client_socket.close()
+
+    return '', 200
+
+
 @app.route("/sign-out")
 def sign_out():
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

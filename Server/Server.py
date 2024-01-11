@@ -165,6 +165,10 @@ def gems_by_vault(data, client):
     client.send('@'.encode())
 
 
+def delete_gem_from_vault(data, client):
+    pass
+
+
 def act(action, data, client):
     actions = {"adduser": adduser,
                "sign-in": sign_in,
@@ -177,7 +181,8 @@ def act(action, data, client):
                "get-vault-by-title": search_vault,
                "update-vault-desc": update_description,
                "find-desc": get_desc,
-               "get-gems-by-vault": gems_by_vault}
+               "get-gems-by-vault": gems_by_vault,
+               "delete-gem-from-vault": delete_gem_from_vault}
 
     actions[action](data, client)
 
