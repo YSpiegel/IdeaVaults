@@ -64,16 +64,11 @@ def remove_ip(name):
         users.update_one({'name': name}, {"$unset": {"ip": ""}})
 
 
-def get_private_vaults(user):
+def get_vaults_by_type(user, type):
     with MongoClient(uri) as cluster:
         vaults = cluster['IdeaVaults']['Vaults']
-        return list(vaults.find({'user': user, 'type': "private"}))
-
-
-def get_shared_vaults(user):
-    with MongoClient(uri) as cluster:
-        vaults = cluster['IdeaVaults']['Vaults']
-        return list(vaults.find({'user': user, 'type': "shared"}))
+        #print(list(vaults.find({'user': user, 'type': type})))
+        return list(vaults.find({'user': user, 'type': type}))
 
 
 def check_if_new_vault(vault_title, user):
@@ -104,10 +99,10 @@ def get_vault(user, title):
         return vaults.find_one({'user':user, 'title':title})
 
 
-def get_gems(vault, user):
+def get_gems(vault):
     with MongoClient(uri) as cluster:
         gems = cluster['IdeaVaults']['Gems']
-        return list(gems.find({'vault': vault, 'user': user}))
+        return list(gems.find({'vault': vault.title, 'user': vault.user}))
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-import socket, re
+import socket, pickle, re
 import DBHandle
 import ObjManagement as obj
 import threading as th
@@ -15,12 +15,12 @@ def adduser(data, client):
     :param client: Client object
     :return:
     """
-    name, email, password = data.split(":")
+    name, email, password = data
     new_name = DBHandle.check_if_new(name)
     new_email = DBHandle.check_if_new(email)
     valid_name = re.match(r'^[a-zA-Z0-9_ ]{4,20}$', name) != None
 
-    client.send(f"{new_name}:{new_email}:{valid_name}".encode())
+    client.send(pickle.dumps((new_name, new_email, valid_name)))
     if new_name and new_email and valid_name:
         DBHandle.add_new(name, email, password)
 
@@ -34,7 +34,7 @@ def sign_in(data, client):
     :param client: Client object
     :return:
     """
-    identifier, password = data.split(":")
+    identifier, password = data
     name = DBHandle.sign_in(identifier, password)
     client.send(name.encode())
 
@@ -46,7 +46,7 @@ def register_user(data, client):
     :param client: Client object
     :return:
     """
-    name, ip = data.split(":")
+    name, ip = data
     already_connected = DBHandle.check_if_connected(name)
     if not already_connected:
         DBHandle.add_ip(name, ip)
@@ -60,11 +60,15 @@ def search_addr(data, client):
     :param client: Client object
     :return:
     """
+    #print('search_addr')
+    #print(data)
     user = DBHandle.find_by_addr(data)
+    #print(user)
     if user:
         client.send(user['name'].encode())
     else:
         client.send("@".encode())
+
 
 def search_vault(data, client):
     """
@@ -79,51 +83,34 @@ def search_vault(data, client):
     else:
         client.send("@".encode())
 
+
 def remove_ip(data, client):
     """
     Disconnects a user by removing the IP field
-    :param data: User to disconnect
+    :param data: address to disconnect
     :param client: Client object
     :return:
     """
-    ip_address = data
-    user = DBHandle.find_by_addr(ip_address)
+    user = DBHandle.find_by_addr(data)
     if user:
         DBHandle.remove_ip(user['name'])
 
 
-def get_private_vaults(data, client):
+def get_vaults_by_type(data, client):
     """
     Passes all private vaults of a certain user
-    :param data: User
+    :param data: user and type
     :param client: Client object
     :return:
     """
-    pvaults = DBHandle.get_private_vaults(data)
+    pvaults = DBHandle.get_vaults_by_type(*data)
     for vault in pvaults:
         vault_obj = obj.Vault(vault['title'], vault['user'], vault['description'], vault['type'])
-        client.send(str(vault_obj).encode())
+        client.send(pickle.dumps(vault_obj))
         confirm = client.recv(1024).decode()
         if confirm != "next":
             return
-    client.send('@'.encode())
-
-
-def get_shared_vaults(data, client):
-    """
-    Passes all shared vaults of a certain user
-    :param data: User
-    :param client: Client object
-    :return:
-    """
-    svaults = DBHandle.get_shared_vaults(data)
-    for vault in svaults:
-        vault_obj = obj.Vault(vault['title'], vault['user'], vault['description'], vault['type'])
-        client.send(str(vault_obj).encode())
-        confirm = client.recv(1024).decode()
-        if confirm != "next":
-            return
-    client.send('@'.encode())
+    client.send(b'@')
 
 
 def add_vault(data, client):
@@ -153,16 +140,15 @@ def get_desc(data, client):
     client.send(vault['description'].encode())
 
 
-def gems_by_vault(data, client):
-    vault, user = data.split(":")
-    gems = DBHandle.get_gems(vault, user)
+def gems_by_vault(vault, client):
+    gems = DBHandle.get_gems(vault)
     for gem in gems:
         gem_obj = obj.Gem(gem['vault'], gem['user'], gem['title'], gem['content'])
-        client.send(str(gem_obj).encode())
+        client.send(pickle.dumps(gem_obj))
         confirm = client.recv(1024).decode()
         if confirm != "next":
             return
-    client.send('@'.encode())
+    client.send(b'@')
 
 
 def delete_gem_from_vault(data, client):
@@ -175,8 +161,7 @@ def act(action, data, client):
                "register-user": register_user,
                "get-user-by-addr": search_addr,
                "remove-ip": remove_ip,
-               "get-private-vaults": get_private_vaults,
-               "get-shared-vaults": get_shared_vaults,
+               "get-vaults-by-type": get_vaults_by_type,
                "add-vault": add_vault,
                "get-vault-by-title": search_vault,
                "update-vault-desc": update_description,
@@ -194,7 +179,7 @@ def main():
 
     while True:
         client, ip = server_socket.accept()
-        action, data = client.recv(1024).decode().split(';')
+        action, data = pickle.loads(client.recv(1024))
         thread = th.Thread(target=act, args=(action, data, client))
         thread.start()
 

@@ -2,7 +2,7 @@ import ObjManagement as obj
 import utils, crypt
 
 from flask import Flask, render_template, request, url_for, redirect, send_from_directory, jsonify
-import socket
+import socket, pickle
 
 app = Flask(__name__)
 
@@ -10,51 +10,50 @@ IP = "127.0.0.1"
 PORT = 7891
 
 
-def get_user(remote_addr):
+def open_con(action, data):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((IP, PORT))
-    client_socket.send(f"get-user-by-addr;{remote_addr}".encode())
-    user = client_socket.recv(1024).decode()
-    client_socket.close()
+    client_socket.send(pickle.dumps((action, data)))
+    return client_socket
 
+
+def get_user(remote_addr):
+    client_socket = open_con("get-user-by-addr", remote_addr)
+    user = client_socket.recv(1024).decode()
+    #print(type(user))
+    client_socket.close()
+    #print(user if user != '@' else "")
     return user if user != '@' else ""
 
 
 def get_vault(title):
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect((IP, PORT))
-    client_socket.send(f"get-vault-by-title;{title}".encode())
+    client_socket = open_con("get-vault-by-title", title)
     vault = obj.vaultfromstr(client_socket.recv(1024).decode())
     return vault if vault != '@' else ""
 
 
 def get_vault_gems(vault):
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect((IP, PORT))
-    client_socket.send(f"get-gems-by-vault;{vault.title}:{vault.user}".encode())
-    gem_str = client_socket.recv(1024).decode()
+    client_socket = open_con("get-gems-by-vault", vault)
+    gem = client_socket.recv(1024)
     gems = []
-    while gem_str != "@":
-        #print(gem_str)
-        gem = obj.gemfromstr(gem_str)
+    while gem != b"@":
+        gem = pickle.loads(gem)
         gems.append(gem)
         client_socket.send("next".encode())
-        gem_str = client_socket.recv(1024).decode()
+        gem = client_socket.recv(1024)
     client_socket.close()
     return gems
 
 
 def get_vaults(user, type):
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect((IP, PORT))
-    client_socket.send(f"get-{type}-vaults;{user}".encode())
-    vault_str = client_socket.recv(1024).decode()
+    client_socket = open_con(f"get-vaults-by-type", (user, type))
+    vault = client_socket.recv(1024)
     vaults = []
-    while vault_str != "@":
-        vault = obj.vaultfromstr(vault_str)
+    while vault != b"@":
+        vault = pickle.loads(vault)
         vaults.append(vault)
         client_socket.send("next".encode())
-        vault_str = client_socket.recv(1024).decode()
+        vault = client_socket.recv(1024)
     client_socket.close()
     return vaults
 
@@ -90,17 +89,12 @@ def connect():
         identifier = request.form['identifier']
         password = crypt.rblhash(request.form['password'])
 
-        info = ":".join([identifier, password])
-        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client_socket.connect((IP, PORT))
-        client_socket.send(f"sign-in;{info}".encode())
+        client_socket = open_con("sign-in", (identifier, password))
         name = client_socket.recv(1024).decode()
         client_socket.close()
 
         if name != '@':
-            client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            client_socket.connect((IP, PORT))
-            client_socket.send(f"register-user;{name}:{request.remote_addr}".encode())
+            client_socket = open_con("register-user", (name, request.remote_addr))
             already_connected = client_socket.recv(1024).decode()
             client_socket.close()
             if already_connected == "False":
@@ -126,27 +120,23 @@ def signup():
         errortext = ""
 
         if password == confirm_password:
-            info = ":".join([name, email, crypt.rblhash(password)])
-            client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            client_socket.connect((IP, PORT))
-            client_socket.send(f"adduser;{info}".encode())
-            new_name, new_email, valid_name = client_socket.recv(1024).decode().split(":")
+            client_socket = open_con("adduser", (name, email, crypt.rblhash(password)))
+            new_name, new_email, valid_name = pickle.loads(client_socket.recv(1024))
             client_socket.close()
 
-            if new_name == "True" and new_email == "True":
-                if valid_name == "True":
-                    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    client_socket.connect((IP, PORT))
-                    client_socket.send(f"register-user;{name}:{request.remote_addr}".encode())
+            if new_name and new_email:
+                if valid_name:
+                    client_socket = open_con("register-user", (name, request.remote_addr))
                     client_socket.close()
                     return redirect(url_for('dashboard'))
                 else:
                     errortext = f"{name} is not a valid name"
+                    print('reached', errortext)
 
             else:
-                if new_name == "False":
+                if not new_name:
                     errortext += f"The name {name} is already taken"
-                if new_email == "False":
+                if not new_email:
                     errortext += f" and {email} is already associated with an account" if errortext \
                         else f"{email} is already associated with an account"
         else:
@@ -159,7 +149,10 @@ def signup():
 
 @app.route('/dashboard')
 def dashboard():
-    return render_template('dashboard.html', user=get_user(request.remote_addr), greeting=utils.get_greeting())
+    user = get_user(request.remote_addr)
+    if user:
+        return render_template('dashboard.html', user=get_user(request.remote_addr), greeting=utils.get_greeting())
+    return redirect(url_for('home'))
 
 
 @app.route('/<type>-vaults')
@@ -265,9 +258,7 @@ def delete_gem():
 
 @app.route("/sign-out")
 def sign_out():
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect((IP, PORT))
-    client_socket.send(f"remove-ip;{request.remote_addr}".encode())
+    client_socket = open_con("remove-ip", request.remote_addr)
     client_socket.close()
 
     return redirect(url_for('home'))
