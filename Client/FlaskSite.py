@@ -26,8 +26,8 @@ def get_user(remote_addr):
 
 def get_vault(title):
     client_socket = open_con("get-vault-by-title", title)
-    vault = obj.vaultfromstr(client_socket.recv(1024).decode())
-    return vault if vault != '@' else ""
+    vault = client_socket.recv(1024)
+    return pickle.loads(vault) if vault != b'@' else ""
 
 
 def get_vault_gems(vault):

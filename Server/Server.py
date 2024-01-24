@@ -53,45 +53,42 @@ def register_user(data, client):
     client.send(str(already_connected).encode())
 
 
-def search_addr(data, client):
+def search_addr(user_ip, client):
     """
     Looks for a user that's already connected
-    :param data: User IP
+    :param user_ip: User IP
     :param client: Client object
     :return:
     """
-    #print('search_addr')
-    #print(data)
-    user = DBHandle.find_by_addr(data)
-    #print(user)
+    user = DBHandle.find_by_addr(user_ip)
     if user:
         client.send(user['name'].encode())
     else:
         client.send("@".encode())
 
 
-def search_vault(data, client):
+def search_vault(vault_title, client):
     """
     Looks for a vault by its title
     :param data: Vault title
     :param client: Client object
     :return:
     """
-    vault = DBHandle.find_by_title(data)
+    vault = DBHandle.find_by_title(vault_title)
     if vault:
-        client.send(str(obj.Vault(vault['title'], vault['user'], vault['description'], vault['type'])).encode())
+        client.send(pickle.dumps(obj.Vault(vault['title'], vault['user'], vault['description'], vault['type'])))
     else:
         client.send("@".encode())
 
 
-def remove_ip(data, client):
+def remove_ip(ip, client):
     """
     Disconnects a user by removing the IP field
-    :param data: address to disconnect
+    :param ip: address to disconnect
     :param client: Client object
     :return:
     """
-    user = DBHandle.find_by_addr(data)
+    user = DBHandle.find_by_addr(ip)
     if user:
         DBHandle.remove_ip(user['name'])
 
@@ -113,23 +110,22 @@ def get_vaults_by_type(data, client):
     client.send(b'@')
 
 
-def add_vault(data, client):
+def add_vault(vault, client):
     """
     Create a new vault for a client
-    :param data: vault obj
+    :param vault: vault obj
     :param client: Client Object
     :return:
     """
-    if not DBHandle.check_if_new_vault(data):
+    if not DBHandle.check_if_new_vault(vault):
         client.send("ChangeTitle".encode())
 
-    DBHandle.add_vault(data)
+    DBHandle.add_vault(vault)
     client.send("OK".encode())
 
 
 def update_description(data, client):
     DBHandle.update_description(*data)
-    #client.send(str(obj.Vault(vault['title'], vault['user'], vault['description'], vault['type'])))
 
 
 def get_desc(data, client):
