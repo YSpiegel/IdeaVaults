@@ -20,9 +20,7 @@ def open_con(action, data):
 def get_user(remote_addr):
     client_socket = open_con("get-user-by-addr", remote_addr)
     user = client_socket.recv(1024).decode()
-    #print(type(user))
     client_socket.close()
-    #print(user if user != '@' else "")
     return user if user != '@' else ""
 
 
@@ -189,9 +187,7 @@ def new_vault():
 
         vault = obj.Vault(title, user, description, type)
 
-        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client_socket.connect((IP, PORT))
-        client_socket.send(f"add-vault;{str(vault)}".encode())
+        client_socket = open_con("add-vault", vault)
         feedback = client_socket.recv(1024).decode()
         client_socket.close()
 
@@ -218,9 +214,7 @@ def update_description():
     title = data['vaultTitle']
     new_desc = data['description']
 
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect((IP, PORT))
-    client_socket.send(f"update-vault-desc;{user}:{title}:{new_desc}".encode())
+    client_socket = open_con("update-vault-desc", (user, title, new_desc))
     client_socket.close()
 
     return '', 200
@@ -232,9 +226,7 @@ def check_description():
     user = get_user(request.remote_addr)
     title = data['vaultTitle']
 
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect((IP, PORT))
-    client_socket.send(f"find-desc;{user}:{title}".encode())
+    client_socket = open_con("find-desc", (user, title))
     desc = client_socket.recv(1024).decode()
     client_socket.close()
 
@@ -248,9 +240,7 @@ def delete_gem():
     gem = data['gemTitle']
     vault = data['vaultTitle']
 
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect((IP, PORT))
-    client_socket.send(f"delete-gem-from-vault;{vault}:{gem}".encode())
+    client_socket = open_con("delete-gem-from-vault", (vault, gem))
     client_socket.close()
 
     return '', 200

@@ -116,27 +116,24 @@ def get_vaults_by_type(data, client):
 def add_vault(data, client):
     """
     Create a new vault for a client
-    :param data: vault string obj
+    :param data: vault obj
     :param client: Client Object
     :return:
     """
-    vault = obj.vaultfromstr(data)
-    if not DBHandle.check_if_new_vault(vault.title, vault.user):
+    if not DBHandle.check_if_new_vault(data):
         client.send("ChangeTitle".encode())
 
-    DBHandle.add_vault(vault)
+    DBHandle.add_vault(data)
     client.send("OK".encode())
 
 
 def update_description(data, client):
-    print(f'Reached with {data}')
-    vault = DBHandle.update_description(*data.split(":"))
+    DBHandle.update_description(*data)
     #client.send(str(obj.Vault(vault['title'], vault['user'], vault['description'], vault['type'])))
 
 
 def get_desc(data, client):
-    user, title = data.split(":")
-    vault = DBHandle.get_vault(user, title)
+    vault = DBHandle.get_vault(*data)
     client.send(vault['description'].encode())
 
 
@@ -168,7 +165,6 @@ def act(action, data, client):
                "find-desc": get_desc,
                "get-gems-by-vault": gems_by_vault,
                "delete-gem-from-vault": delete_gem_from_vault}
-
     actions[action](data, client)
 
 

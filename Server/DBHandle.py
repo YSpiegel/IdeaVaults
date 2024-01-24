@@ -71,11 +71,11 @@ def get_vaults_by_type(user, type):
         return list(vaults.find({'user': user, 'type': type}))
 
 
-def check_if_new_vault(vault_title, user):
+def check_if_new_vault(vault):
     with MongoClient(uri) as cluster:
         vaults = cluster['IdeaVaults']['Vaults']
-        exists = bool(vaults.find_one({'title': vault_title,
-                                      'user': user}))
+        exists = bool(vaults.find_one({'title': vault.title,
+                                      'user': vault.user}))
         return not exists
 
 
