@@ -233,6 +233,20 @@ def check_description():
     return desc
 
 
+@app.route('/add-new-gem', methods=['POST'])
+def add_new_gem():
+    data = request.get_json()
+    user = get_user(request.remote_addr)
+    vault_title = data['vaultTitle']
+    new_gem_title = data['newGemTitle']
+    new_gem_content = data['newGemContent']
+
+    client_socket = open_con("add-gem-to-vault", (user, vault_title, new_gem_title, new_gem_content))
+    client_socket.close()
+
+    return '', 200
+
+
 @app.route('/delete-gem', methods=['POST'])
 def delete_gem():
     data = request.get_json()

@@ -11,7 +11,8 @@
                 <li class="nav-item"><a class="nav-link active" aria-current="page" href=""
                                         data-bs-toggle="modal" data-bs-target="#descriptionModal">
                     Description</a></li>
-                <li class="nav-item"><a class="nav-link active" aria-current="page" href="#" id="newgemlink">
+                <li class="nav-item"><a class="nav-link active" aria-current="page" href=""
+                                        data-bs-toggle="modal" data-bs-target="#newGemModal">
                     Add New Gem</a></li>
                 <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">
                     Search The Vault</a></li>
@@ -86,6 +87,28 @@
         </div>
     </div>
 </div>
+<div class="modal fade"  id="newGemModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">New Gem</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST">
+                    <label for="new-gem-title" class="col-form-label">Title:</label>
+                    <input type="text" class="form-control" id="new-gem-title" name="new-gem-title">
+                    <label for="new-gem-content" class="col-form-label">Content:</label>
+                    <textarea class="form-control" id="new-gem-content" name="new-gem-content"></textarea>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="addButton" class="btn btn-primary"
+                        data-bs-dismiss="modal">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
 <!---
 <script>
 const modal = bootstrap.Modal(document.getElementById('descriptionModal'));
@@ -131,6 +154,109 @@ document.querySelectorAll('.btn-danger').forEach(button => {
   });
 
 });
+</script>
+<script>
+const addButton = document.getElementById('addButton');
+
+addButton.addEventListener('click', () => {
+    const newGemTitle = document.getElementById('new-gem-title').value;
+    const newGemContent = document.getElementById('new-gem-content').value;
+
+    fetch('/add-new-gem', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        vaultTitle: '{{vault.title}}',
+        newGemTitle: newGemTitle,
+        newGemContent: newGemContent
+      })
+    })
+    .then(response => {
+
+  // Create card
+  const card = document.createElement('div');
+  card.classList.add('card', 'm-2');
+  card.style.flex = "0 0 calc(25% - 2rem)";
+  card.style.maxWidth = "calc(25% - 2rem)";
+
+  // Create header
+  const header = document.createElement('div');
+  header.classList.add('card-header');
+
+  // Create nav
+  const nav = document.createElement('nav');
+  nav.classList.add('navbar', 'bg-body-tertiary');
+  nav.style.padding = 0;
+
+  // Create button group
+  const btnGroup = document.createElement('div');
+  btnGroup.classList.add('btn-group');
+  btnGroup.setAttribute('role', 'group');
+  btnGroup.setAttribute('aria-label', 'Basic example');
+
+  // Add buttons
+  const copyBtn = document.createElement('button');
+  copyBtn.classList.add('btn', 'btn-primary');
+  copyBtn.textContent = 'Copy';
+
+  const editBtn = copyBtn.cloneNode(true);
+  editBtn.textContent = 'Edit';
+
+  const tagsBtn = copyBtn.cloneNode(true);
+  tagsBtn.textContent = 'Tags';
+
+  btnGroup.appendChild(copyBtn);
+  btnGroup.appendChild(editBtn);
+  btnGroup.appendChild(tagsBtn);
+
+  // Create delete button
+  const deleteBtn = document.createElement('button');
+  deleteBtn.classList.add('btn', 'btn-danger', 'btn-sm');
+  deleteBtn.textContent = 'Delete';
+
+  // Add elements to nav
+  nav.appendChild(btnGroup);
+  nav.appendChild(deleteBtn);
+
+  // Add nav to header
+  header.appendChild(nav);
+
+  // Add header to card
+  card.appendChild(header);
+
+  // Create card body
+    const body = document.createElement('div');
+    body.classList.add('card-body');
+
+    // Create title
+    const title = document.createElement('h5');
+    title.classList.add('card-title');
+    title.textContent = newGemTitle;
+
+    // Create preview text
+    const preview = document.createElement('p');
+    preview.classList.add('card-text');
+    preview.textContent = newGemContent;
+
+    // Add elements to body
+    body.appendChild(title);
+    body.appendChild(preview);
+
+    // Add body to card
+    card.appendChild(body);
+
+  // Append new card
+  document.querySelector('.container-flex').appendChild(card);
+
+})
+    .catch(error => {
+      console.log('Error:', error);
+    });
+  });
+
+
 </script>
 <script>
 

@@ -105,5 +105,15 @@ def get_gems(vault):
         return list(gems.find({'vault': vault.title, 'user': vault.user}))
 
 
+def add_new_gem(user, vault, title, content):
+    print('INDB')
+    with MongoClient(uri) as cluster:
+        gems = cluster['IdeaVaults']['Gems']
+        gems.insert_one({'user': user, 'vault': vault, 'title': title, 'content': content})
+        print('ADDED')
+
+    #return obj.Gem(vault, user, title, content)
+
+
 if __name__ == "__main__":
     print(bool("False"))
