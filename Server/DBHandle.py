@@ -67,7 +67,6 @@ def remove_ip(name):
 def get_vaults_by_type(user, type):
     with MongoClient(uri) as cluster:
         vaults = cluster['IdeaVaults']['Vaults']
-        #print(list(vaults.find({'user': user, 'type': type})))
         return list(vaults.find({'user': user, 'type': type}))
 
 
@@ -105,12 +104,17 @@ def get_gems(vault):
         return list(gems.find({'vault': vault.title, 'user': vault.user}))
 
 
+def check_if_new_gem(user, vault, title):
+    with MongoClient(uri) as cluster:
+        gems = cluster['IdeaVaults']['Gems']
+        exists = bool(gems.find_one({'user': user, 'vault': vault, 'title': title}))
+        return not exists
+
+
 def add_new_gem(user, vault, title, content):
-    print('INDB')
     with MongoClient(uri) as cluster:
         gems = cluster['IdeaVaults']['Gems']
         gems.insert_one({'user': user, 'vault': vault, 'title': title, 'content': content})
-        print('ADDED')
 
     #return obj.Gem(vault, user, title, content)
 

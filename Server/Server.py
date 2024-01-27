@@ -145,9 +145,13 @@ def gems_by_vault(vault, client):
 
 
 def add_gem_to_vault(data, client):
-    print("INSERV")
     DBHandle.add_new_gem(*data)
     #client.send(pickle.dumps(new_gem))
+
+
+def check_new_gem_title(data, client):
+    response = '200' if DBHandle.check_if_new_gem(*data) else '409'
+    client.send(response.encode())
 
 
 def delete_gem_from_vault(data, client):
@@ -167,7 +171,9 @@ def act(action, data, client):
                "find-desc": get_desc,
                "get-gems-by-vault": gems_by_vault,
                "delete-gem-from-vault": delete_gem_from_vault,
-               "add-gem-to-vault": add_gem_to_vault}
+               "add-gem-to-vault": add_gem_to_vault,
+               "check-new-gem-title": check_new_gem_title}
+
     actions[action](data, client)
 
 

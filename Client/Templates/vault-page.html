@@ -104,24 +104,13 @@
             </div>
             <div class="modal-footer">
                 <button type="button" id="addButton" class="btn btn-primary"
-                        data-bs-dismiss="modal">Add</button>
+                        data-bs-dismiss="modal" disabled>Add</button>
             </div>
         </div>
     </div>
 </div>
-<!---
-<script>
-const modal = bootstrap.Modal(document.getElementById('descriptionModal'));
 
-modal.addEventListener('shown.bs.modal', () => {
-
-    const new = document.getElementById('newgemlink');
-    new.disabled = true;
-
-});
-</script>
---->
-<script>
+<script id="delete-buttons">
 // Add click event listener to all delete buttons
 document.querySelectorAll('.btn-danger').forEach(button => {
 
@@ -155,8 +144,46 @@ document.querySelectorAll('.btn-danger').forEach(button => {
 
 });
 </script>
-<script>
+<script id="add-gem-events">
+
+
 const addButton = document.getElementById('addButton');
+const gemTitle = document.getElementById('new-gem-title');
+const gemContent = document.getElementById('new-gem-content');
+
+function checkInputs() {
+    fetch('/check-new-gem-title', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        vaultTitle: '{{vault.title}}',
+        gemTitle: gemTitle.value
+      })
+    })
+    .then(response => {
+    if(response.status == 200) {
+        if(gemTitle.value.length == 0 || gemContent.value.length == 0) {
+            addButton.disabled = true;
+        } else {
+            addButton.disabled = false;
+        }
+    }
+    else if(response.status == 409){
+        addButton.disabled = true;
+        document.getElementById('new-title-label').value = "Title (Make sure it's new):"
+    }
+    })
+    .catch(error => {
+      console.log('Error:', error);
+    });
+}
+
+
+gemTitle.addEventListener('input', checkInputs);
+gemContent.addEventListener('input', checkInputs);
+
 
 addButton.addEventListener('click', () => {
     const newGemTitle = document.getElementById('new-gem-title').value;
@@ -175,90 +202,88 @@ addButton.addEventListener('click', () => {
     })
     .then(response => {
 
-  // Create card
-  const card = document.createElement('div');
-  card.classList.add('card', 'm-2');
-  card.style.flex = "0 0 calc(25% - 2rem)";
-  card.style.maxWidth = "calc(25% - 2rem)";
+      // Create card
+      const card = document.createElement('div');
+      card.classList.add('card', 'm-2');
+      card.style.flex = "0 0 calc(25% - 2rem)";
+      card.style.maxWidth = "calc(25% - 2rem)";
 
-  // Create header
-  const header = document.createElement('div');
-  header.classList.add('card-header');
+      // Create header
+      const header = document.createElement('div');
+      header.classList.add('card-header');
 
-  // Create nav
-  const nav = document.createElement('nav');
-  nav.classList.add('navbar', 'bg-body-tertiary');
-  nav.style.padding = 0;
+      // Create nav
+      const nav = document.createElement('nav');
+      nav.classList.add('navbar', 'bg-body-tertiary');
+      nav.style.padding = 0;
 
-  // Create button group
-  const btnGroup = document.createElement('div');
-  btnGroup.classList.add('btn-group');
-  btnGroup.setAttribute('role', 'group');
-  btnGroup.setAttribute('aria-label', 'Basic example');
+      // Create button group
+      const btnGroup = document.createElement('div');
+      btnGroup.classList.add('btn-group');
+      btnGroup.setAttribute('role', 'group');
+      btnGroup.setAttribute('aria-label', 'Basic example');
 
-  // Add buttons
-  const copyBtn = document.createElement('button');
-  copyBtn.classList.add('btn', 'btn-primary');
-  copyBtn.textContent = 'Copy';
+      // Add buttons
+      const copyBtn = document.createElement('button');
+      copyBtn.classList.add('btn', 'btn-primary');
+      copyBtn.textContent = 'Copy';
 
-  const editBtn = copyBtn.cloneNode(true);
-  editBtn.textContent = 'Edit';
+      const editBtn = copyBtn.cloneNode(true);
+      editBtn.textContent = 'Edit';
 
-  const tagsBtn = copyBtn.cloneNode(true);
-  tagsBtn.textContent = 'Tags';
+      const tagsBtn = copyBtn.cloneNode(true);
+      tagsBtn.textContent = 'Tags';
 
-  btnGroup.appendChild(copyBtn);
-  btnGroup.appendChild(editBtn);
-  btnGroup.appendChild(tagsBtn);
+      btnGroup.appendChild(copyBtn);
+      btnGroup.appendChild(editBtn);
+      btnGroup.appendChild(tagsBtn);
 
-  // Create delete button
-  const deleteBtn = document.createElement('button');
-  deleteBtn.classList.add('btn', 'btn-danger', 'btn-sm');
-  deleteBtn.textContent = 'Delete';
+      // Create delete button
+      const deleteBtn = document.createElement('button');
+      deleteBtn.classList.add('btn', 'btn-danger', 'btn-sm');
+      deleteBtn.textContent = 'Delete';
 
-  // Add elements to nav
-  nav.appendChild(btnGroup);
-  nav.appendChild(deleteBtn);
+      // Add elements to nav
+      nav.appendChild(btnGroup);
+      nav.appendChild(deleteBtn);
 
-  // Add nav to header
-  header.appendChild(nav);
+      // Add nav to header
+      header.appendChild(nav);
 
-  // Add header to card
-  card.appendChild(header);
+      // Add header to card
+      card.appendChild(header);
 
-  // Create card body
-    const body = document.createElement('div');
-    body.classList.add('card-body');
+    // Create card body
+        const body = document.createElement('div');
+        body.classList.add('card-body');
 
-    // Create title
-    const title = document.createElement('h5');
-    title.classList.add('card-title');
-    title.textContent = newGemTitle;
+        // Create title
+        const title = document.createElement('h5');
+        title.classList.add('card-title');
+        title.textContent = newGemTitle;
 
-    // Create preview text
-    const preview = document.createElement('p');
-    preview.classList.add('card-text');
-    preview.textContent = newGemContent;
+        // Create preview text
+        const preview = document.createElement('p');
+        preview.classList.add('card-text');
+        preview.textContent = newGemContent;
 
-    // Add elements to body
-    body.appendChild(title);
-    body.appendChild(preview);
+        // Add elements to body
+        body.appendChild(title);
+        body.appendChild(preview);
 
-    // Add body to card
-    card.appendChild(body);
+        // Add body to card
+        card.appendChild(body);
 
-  // Append new card
-  document.querySelector('.container-flex').appendChild(card);
+          // Append new card
+          document.querySelector('.container-flex').appendChild(card);
 
-})
+    })
     .catch(error => {
       console.log('Error:', error);
     });
   });
-
-
 </script>
-<script>
+<script id="orgainzation-needed">
 
 const description = document.getElementById('description');
 const updateButton = document.getElementById('updateButton');
@@ -332,7 +357,7 @@ description.addEventListener('input', () => {
 
 });
 </script>
-<script>
+<script id="spread-navbar">
 
 
 const nav = document.getElementById('vault-navbar');

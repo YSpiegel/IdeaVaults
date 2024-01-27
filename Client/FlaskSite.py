@@ -129,7 +129,6 @@ def signup():
                     return redirect(url_for('dashboard'))
                 else:
                     errortext = f"{name} is not a valid name"
-                    print('reached', errortext)
 
             else:
                 if not new_name:
@@ -246,6 +245,19 @@ def add_new_gem():
 
     return '', 200
 
+
+@app.route('/check-new-gem-title', methods=['POST'])
+def check_new_gem_title():
+    data = request.get_json()
+    user = get_user(request.remote_addr)
+    vault = data['vaultTitle']
+    title = data['gemTitle']
+
+    client_socket = open_con("check-new-gem-title", (user, vault, title))
+    response = int(client_socket.recv(1024).decode())
+    client_socket.close()
+
+    return '', response
 
 @app.route('/delete-gem', methods=['POST'])
 def delete_gem():
