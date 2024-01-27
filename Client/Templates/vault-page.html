@@ -92,11 +92,11 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h1 class="modal-title fs-5">New Gem</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="closeNewGem"></button>
             </div>
             <div class="modal-body">
                 <form method="POST">
-                    <label for="new-gem-title" class="col-form-label">Title:</label>
+                    <label for="new-gem-title" class="col-form-label" id="new-title-label">Title:</label>
                     <input type="text" class="form-control" id="new-gem-title" name="new-gem-title">
                     <label for="new-gem-content" class="col-form-label">Content:</label>
                     <textarea class="form-control" id="new-gem-content" name="new-gem-content"></textarea>
@@ -151,6 +151,13 @@ const addButton = document.getElementById('addButton');
 const gemTitle = document.getElementById('new-gem-title');
 const gemContent = document.getElementById('new-gem-content');
 
+const closeButton = document.getElementById('closeNewGem');
+
+closeButton.addEventListener('click', () => {
+    gemTitle.value = "";
+    gemContent.value = "";
+});
+
 function checkInputs() {
     fetch('/check-new-gem-title', {
       method: 'POST',
@@ -169,10 +176,11 @@ function checkInputs() {
         } else {
             addButton.disabled = false;
         }
+        document.getElementById('new-title-label').innerHTML = "Title:"
     }
     else if(response.status == 409){
         addButton.disabled = true;
-        document.getElementById('new-title-label').value = "Title (Make sure it's new):"
+        document.getElementById('new-title-label').innerHTML = "Title (Make sure it's new):"
     }
     })
     .catch(error => {
@@ -277,6 +285,8 @@ addButton.addEventListener('click', () => {
           // Append new card
           document.querySelector('.container-flex').appendChild(card);
 
+        gemTitle.value = "";
+        gemContent.value = "";
     })
     .catch(error => {
       console.log('Error:', error);
