@@ -57,6 +57,7 @@ class Gem:
         self.user = user
         self.title = title
         self.content = content
+        self.idtitle = self.title.replace(' ', '_')
 
         self.preview = string_preview(self.content, 14, 21)
 

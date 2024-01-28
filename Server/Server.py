@@ -149,9 +149,14 @@ def add_gem_to_vault(data, client):
     #client.send(pickle.dumps(new_gem))
 
 
-def check_new_gem_title(data, client):
-    response = '200' if DBHandle.check_if_new_gem(*data) else '409'
-    client.send(response.encode())
+def gem_title_validation(data, client):
+    if DBHandle.check_if_existing_gem(*data):
+        client.send("409".encode())
+        return
+    if re.match(r'^[A-Za-z0-9\-:. ]*$', data[-1]) == None:
+        client.send("1001".encode())
+        return
+    client.send("200".encode())
 
 
 def delete_gem_from_vault(data, client):
@@ -172,7 +177,7 @@ def act(action, data, client):
                "get-gems-by-vault": gems_by_vault,
                "delete-gem-from-vault": delete_gem_from_vault,
                "add-gem-to-vault": add_gem_to_vault,
-               "check-new-gem-title": check_new_gem_title}
+               "gem-title-validation": gem_title_validation}
 
     actions[action](data, client)
 

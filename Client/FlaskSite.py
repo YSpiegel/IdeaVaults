@@ -246,14 +246,14 @@ def add_new_gem():
     return '', 200
 
 
-@app.route('/check-new-gem-title', methods=['POST'])
-def check_new_gem_title():
+@app.route('/gem-title-validation', methods=['POST'])
+def gem_title_validation():
     data = request.get_json()
     user = get_user(request.remote_addr)
     vault = data['vaultTitle']
     title = data['gemTitle']
 
-    client_socket = open_con("check-new-gem-title", (user, vault, title))
+    client_socket = open_con("gem-title-validation", (user, vault, title))
     response = int(client_socket.recv(1024).decode())
     client_socket.close()
 

@@ -104,11 +104,10 @@ def get_gems(vault):
         return list(gems.find({'vault': vault.title, 'user': vault.user}))
 
 
-def check_if_new_gem(user, vault, title):
+def check_if_existing_gem(user, vault, title):
     with MongoClient(uri) as cluster:
         gems = cluster['IdeaVaults']['Gems']
-        exists = bool(gems.find_one({'user': user, 'vault': vault, 'title': title}))
-        return not exists
+        return bool(gems.find_one({'user': user, 'vault': vault, 'title': title}))
 
 
 def add_new_gem(user, vault, title, content):
