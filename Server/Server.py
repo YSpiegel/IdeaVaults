@@ -155,7 +155,7 @@ def check_new_gem_title(data, client):
 
 
 def delete_gem_from_vault(data, client):
-    pass
+    DBHandle.delete_gem(*data)
 
 
 def act(action, data, client):

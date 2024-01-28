@@ -119,5 +119,11 @@ def add_new_gem(user, vault, title, content):
     #return obj.Gem(vault, user, title, content)
 
 
+def delete_gem(gem, vault):
+    with MongoClient(uri) as cluster:
+        gems = cluster['IdeaVaults']['Gems']
+        gems.delete_one({'title': gem, 'vault':vault})
+
+
 if __name__ == "__main__":
     print(bool("False"))

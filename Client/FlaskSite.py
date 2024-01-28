@@ -263,11 +263,11 @@ def check_new_gem_title():
 def delete_gem():
     data = request.get_json()
     #user = get_user(request.remote_addr)
-    #gem = data['gemTitle']
-    #vault = data['vaultTitle']
-    print(data['check'])
-    #client_socket = open_con("delete-gem-from-vault", (vault, gem))
-    #client_socket.close()
+    gem = data['gem']
+    vault = data['vault']
+
+    client_socket = open_con("delete-gem-from-vault", (gem, vault))
+    client_socket.close()
 
     return '', 200
 
