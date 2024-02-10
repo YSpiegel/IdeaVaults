@@ -19,7 +19,7 @@ def open_con(action, data):
 
 def get_mac_address():
     mac = uuid.getnode()
-    return ':'.join(("%012X" % mac)[i:i+2] for i in range(0, 12, 2))
+    return crypt.rblhash(':'.join(("%012X" % mac)[i:i+2] for i in range(0, 12, 2)))
 
 
 def get_user():
