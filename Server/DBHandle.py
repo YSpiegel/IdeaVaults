@@ -20,7 +20,7 @@ def check_if_connected(name):
         users = cluster['IdeaVaults']['Users']
         user = users.find_one({"name": name})
         try:
-            return bool(user['ip'])
+            return bool(user['mac'])
         except:
             return False
 
@@ -40,16 +40,16 @@ def sign_in(identifier, password):
         return '@'
 
 
-def add_ip(name, ip):
+def add_mac(name, mac):
     with MongoClient(uri) as cluster:
         users = cluster['IdeaVaults']['Users']
-        users.update_one({'name': name}, {"$set": {"ip":ip}})
+        users.update_one({'name': name}, {"$set": {"mac":mac}})
 
 
 def find_by_addr(addr):
     with MongoClient(uri) as cluster:
         users = cluster['IdeaVaults']['Users']
-        return users.find_one({'ip':addr})
+        return users.find_one({'mac':addr})
 
 
 def find_by_title(title):
@@ -58,10 +58,10 @@ def find_by_title(title):
         return users.find_one({'title':title})
 
 
-def remove_ip(name):
+def remove_mac(name):
     with MongoClient(uri) as cluster:
         users = cluster['IdeaVaults']['Users']
-        users.update_one({'name': name}, {"$unset": {"ip": ""}})
+        users.update_one({'name': name}, {"$unset": {"mac": ""}})
 
 
 def get_vaults_by_type(user, type):

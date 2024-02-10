@@ -2,7 +2,7 @@ import ObjManagement as obj
 import utils, crypt
 
 from flask import Flask, render_template, request, url_for, redirect, send_from_directory, jsonify
-import socket, pickle
+import socket, pickle, uuid
 
 app = Flask(__name__)
 
@@ -17,8 +17,13 @@ def open_con(action, data):
     return client_socket
 
 
-def get_user(remote_addr):
-    client_socket = open_con("get-user-by-addr", remote_addr)
+def get_mac_address():
+    mac = uuid.getnode()
+    return ':'.join(("%012X" % mac)[i:i+2] for i in range(0, 12, 2))
+
+
+def get_user():
+    client_socket = open_con("get-user-by-addr", get_mac_address())
     user = client_socket.recv(1024).decode()
     client_socket.close()
     return user if user != '@' else ""
@@ -71,7 +76,7 @@ def base():
 
 @app.route('/home')
 def home():
-    user = get_user(request.remote_addr)
+    user = get_user()
     if user:
         return redirect(url_for('dashboard'))
     return render_template("home.html")
@@ -79,7 +84,7 @@ def home():
 
 @app.route('/connect', methods=['GET', 'POST'])
 def connect():
-    user = get_user(request.remote_addr)
+    user = get_user()
     if user:
         return redirect(url_for('dashboard'))
 
@@ -92,7 +97,7 @@ def connect():
         client_socket.close()
 
         if name != '@':
-            client_socket = open_con("register-user", (name, request.remote_addr))
+            client_socket = open_con("register-user", (name, get_mac_address()))
             already_connected = client_socket.recv(1024).decode()
             client_socket.close()
             if already_connected == "False":
@@ -106,7 +111,7 @@ def connect():
 
 @app.route('/sign-up', methods=['GET', 'POST'])
 def signup():
-    user = get_user(request.remote_addr)
+    user = get_user()
     if user:
         return redirect(url_for('dashboard'))
 
@@ -124,7 +129,7 @@ def signup():
 
             if new_name and new_email:
                 if valid_name:
-                    client_socket = open_con("register-user", (name, request.remote_addr))
+                    client_socket = open_con("register-user", (name, get_mac_address()))
                     client_socket.close()
                     return redirect(url_for('dashboard'))
                 else:
@@ -146,15 +151,15 @@ def signup():
 
 @app.route('/dashboard')
 def dashboard():
-    user = get_user(request.remote_addr)
+    user = get_user()
     if user:
-        return render_template('dashboard.html', user=get_user(request.remote_addr), greeting=utils.get_greeting())
+        return render_template('dashboard.html', user=user, greeting=utils.get_greeting())
     return redirect(url_for('home'))
 
 
 @app.route('/<type>-vaults')
 def vaults_hub(type):
-    user = get_user(request.remote_addr)
+    user = get_user()
     return render_template('vaults-hub.html', type=type, user=user, vaults=get_vaults(user, type))
 
 
@@ -165,7 +170,7 @@ def redirect_new_vault(type):
 
 @app.route('/new-vault', methods=['GET', 'POST'])
 def new_vault():
-    user = get_user(request.remote_addr)
+    user = get_user()
     type = request.args.get('type')
 
     if request.method == "POST":
@@ -200,7 +205,7 @@ def new_vault():
 
 @app.route('/<type>-vaults/<vault>')
 def vault_page(type, vault):
-    user = get_user(request.remote_addr)
+    user = get_user()
     vault = get_vault(vault)
     gems = get_vault_gems(vault)
     return render_template('vault-page.html', user=user, vault=vault, gems=gems)
@@ -209,7 +214,7 @@ def vault_page(type, vault):
 @app.route('/update-description', methods=['POST'])
 def update_description():
     data = request.get_json()
-    user = get_user(request.remote_addr)
+    user = get_user()
     title = data['vaultTitle']
     new_desc = data['description']
 
@@ -222,7 +227,7 @@ def update_description():
 @app.route('/check-description', methods=['POST'])
 def check_description():
     data = request.get_json()
-    user = get_user(request.remote_addr)
+    user = get_user()
     title = data['vaultTitle']
 
     client_socket = open_con("find-desc", (user, title))
@@ -235,7 +240,7 @@ def check_description():
 @app.route('/add-new-gem', methods=['POST'])
 def add_new_gem():
     data = request.get_json()
-    user = get_user(request.remote_addr)
+    user = get_user()
     vault_title = data['vaultTitle']
     new_gem_title = data['newGemTitle']
     new_gem_content = data['newGemContent']
@@ -249,7 +254,7 @@ def add_new_gem():
 @app.route('/gem-title-validation', methods=['POST'])
 def gem_title_validation():
     data = request.get_json()
-    user = get_user(request.remote_addr)
+    user = get_user()
     vault = data['vaultTitle']
     title = data['gemTitle']
 
@@ -262,7 +267,6 @@ def gem_title_validation():
 @app.route('/delete-gem', methods=['POST'])
 def delete_gem():
     data = request.get_json()
-    #user = get_user(request.remote_addr)
     gem = data['gem']
     vault = data['vault']
 
@@ -274,11 +278,12 @@ def delete_gem():
 
 @app.route("/sign-out")
 def sign_out():
-    client_socket = open_con("remove-ip", request.remote_addr)
+    client_socket = open_con("remove-mac", get_mac_address())
+    client_socket.recv(1024)
     client_socket.close()
 
     return redirect(url_for('home'))
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="172.20.129.29")
+    app.run(debug=True)

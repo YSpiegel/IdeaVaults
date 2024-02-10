@@ -42,25 +42,25 @@ def sign_in(data, client):
 def register_user(data, client):
     """
     Registers an entry of a user to the system
-    :param data: Username and IP
+    :param data: Username and MAC
     :param client: Client object
     :return:
     """
-    name, ip = data
+    name, mac = data
     already_connected = DBHandle.check_if_connected(name)
     if not already_connected:
-        DBHandle.add_ip(name, ip)
+        DBHandle.add_mac(name, mac)
     client.send(str(already_connected).encode())
 
 
-def search_addr(user_ip, client):
+def search_addr(user_mac, client):
     """
     Looks for a user that's already connected
-    :param user_ip: User IP
+    :param user_mac: User MAC
     :param client: Client object
     :return:
     """
-    user = DBHandle.find_by_addr(user_ip)
+    user = DBHandle.find_by_addr(user_mac)
     if user:
         client.send(user['name'].encode())
     else:
@@ -81,16 +81,17 @@ def search_vault(vault_title, client):
         client.send("@".encode())
 
 
-def remove_ip(ip, client):
+def remove_mac(mac, client):
     """
-    Disconnects a user by removing the IP field
-    :param ip: address to disconnect
+    Disconnects a user by removing the MAC field
+    :param mac: address to disconnect
     :param client: Client object
     :return:
     """
-    user = DBHandle.find_by_addr(ip)
+    user = DBHandle.find_by_addr(mac)
     if user:
-        DBHandle.remove_ip(user['name'])
+        DBHandle.remove_mac(user['name'])
+    client.send('Done'.encode())
 
 
 def get_vaults_by_type(data, client):
@@ -168,7 +169,7 @@ def act(action, data, client):
                "sign-in": sign_in,
                "register-user": register_user,
                "get-user-by-addr": search_addr,
-               "remove-ip": remove_ip,
+               "remove-mac": remove_mac,
                "get-vaults-by-type": get_vaults_by_type,
                "add-vault": add_vault,
                "get-vault-by-title": search_vault,
