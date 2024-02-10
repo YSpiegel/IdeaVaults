@@ -6,6 +6,7 @@
 <div class="container justify-content-center">
     <h1>{{ user }}'s {{type}} vaults</h1>
     <div id="vaultscarousel" class="carousel slide">
+
         <div class="carousel-inner">
             {% for vault in vaults %}
             <div class="carousel-item {% if loop.first %}active{% endif %}">
@@ -48,7 +49,16 @@
         <button class="carousel-control-next" type="button" data-bs-target="#vaultscarousel" data-bs-slide="next">
             <img src="/static/arrow-right.png" width="30%">
         </button>
+        <br><br><br>
+        <div class="carousel-indicators">
+            {% for vault in vaults %}
+                <button type="button" data-bs-target="#vaultscarousel" data-bs-slide-to="{{loop.index0}}"
+                        {% if loop.first %}class="active"{% endif %} aria-label="Slide {{loop.index}}"
+                        style="background-color: #1e90ff"></button>
+            {% endfor %}
+        </div>
         {% endif %}
+
     </div>
     <div class="container d-flex justify-content-end">
         <!--<button class="button" data-bs-target="#vaultscarousel"
