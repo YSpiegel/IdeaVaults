@@ -15,12 +15,16 @@ function confirmDeleteGem(gemTitle) {
     })
   })
   .then(response => {
-    var element = document.getElementById('card' + gemTitle);
+    var element = document.getElementById('card' + getIdTitle(gemTitle));
     element.parentNode.removeChild(element);
   })
   .catch(error => {
     console.log('Error:', error);
   });
+}
+
+function getIdTitle(title) {
+    return title.replace(/ /g, '_');
 }
 </script>
 <div class="container justify-content-center">
@@ -59,7 +63,7 @@ function confirmDeleteGem(gemTitle) {
                   <button type="button" class="btn btn-primary">Tags</button>
                 </div>
                 <button class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                        data-bs-target="#deleteModal{{gem.title}}">Delete</button>
+                        data-bs-target="#deleteModal{{gem.idtitle}}">Delete</button>
                 </nav>
         </div>
             <div class="card-body">
@@ -67,7 +71,7 @@ function confirmDeleteGem(gemTitle) {
             <p class="card-text">{{gem.preview}}</p>
             </div>
     </div>
-    <div class="modal fade" id="deleteModal{{gem.title}}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal fade" id="deleteModal{{gem.idtitle}}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
           <div class="modal-dialog">
             <div class="modal-content">
             <div class="modal-header">
@@ -202,6 +206,7 @@ addButton.addEventListener('click', () => {
 
       // Create card
       const card = document.createElement('div');
+      card.id = 'card' + getIdTitle(newGemTitle);
       card.classList.add('card', 'm-2');
       card.style.flex = "0 0 calc(25% - 2rem)";
       card.style.maxWidth = "calc(25% - 2rem)";
@@ -239,7 +244,7 @@ addButton.addEventListener('click', () => {
         // Create delete modal
         const deleteModal = document.createElement('div');
         deleteModal.classList.add('modal', 'fade');
-        deleteModal.id = `deleteModal${newGemTitle}`;
+        deleteModal.id = `deleteModal${getIdTitle(newGemTitle)}`;
         deleteModal.setAttribute('tabindex', '-1');
         deleteModal.setAttribute('aria-labelledby', 'deleteModalLabel');
         deleteModal.setAttribute('aria-hidden', 'true');
@@ -291,6 +296,7 @@ addButton.addEventListener('click', () => {
         const confirmBtn = document.createElement('button');
         confirmBtn.classList.add('btn', 'btn-danger');
         confirmBtn.textContent = 'Delete';
+        confirmBtn.setAttribute('data-bs-dismiss', 'modal');
         confirmBtn.addEventListener('click', () => {confirmDeleteGem(newGemTitle)});
 
         modalFooter.appendChild(cancelBtn);
@@ -315,7 +321,7 @@ addButton.addEventListener('click', () => {
       deleteBtn.addEventListener('click', () => {
 
           // Get modal
-          const modal = document.getElementById(`deleteModal${newGemTitle}`);
+          const modal = document.getElementById(`deleteModal${getIdTitle(newGemTitle)}`);
 
           // Initialize and show modal
           const myModal = new bootstrap.Modal(modal);
