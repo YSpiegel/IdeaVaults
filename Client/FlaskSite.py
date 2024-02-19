@@ -277,6 +277,12 @@ def delete_gem():
     return '', 200
 
 
+@app.route('/making-<vault>-public')
+def make_public(vault):
+    client = open_con("make-public", vault)
+    return redirect(f'/shared-vaults/{vault}')
+
+
 @app.route("/sign-out")
 def sign_out():
     client_socket = open_con("remove-mac", get_mac_address())

@@ -164,6 +164,10 @@ def delete_gem_from_vault(data, client):
     DBHandle.delete_gem(*data)
 
 
+def make_public(data, client):
+    DBHandle.make_public(data)
+
+
 def act(action, data, client):
     actions = {"adduser": adduser,
                "sign-in": sign_in,
@@ -178,7 +182,8 @@ def act(action, data, client):
                "get-gems-by-vault": gems_by_vault,
                "delete-gem-from-vault": delete_gem_from_vault,
                "add-gem-to-vault": add_gem_to_vault,
-               "gem-title-validation": gem_title_validation}
+               "gem-title-validation": gem_title_validation,
+               "make-public": make_public}
 
     actions[action](data, client)
 

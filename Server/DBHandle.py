@@ -124,6 +124,12 @@ def delete_gem(gem, vault):
         gems.delete_one({'title': gem, 'vault':vault})
 
 
+def make_public(vault):
+    with MongoClient(uri) as cluster:
+        vaults = cluster['IdeaVaults']['Vaults']
+        vaults.update_one({'title': vault}, {'$set': {'type': "shared", 'collaborators': []}})
+
+
 if __name__ == "__main__":
     with MongoClient(uri) as cluster:
         vaults = cluster['IdeaVaults']['Vaults']
