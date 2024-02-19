@@ -264,6 +264,7 @@ def gem_title_validation():
 
     return '', response
 
+
 @app.route('/delete-gem', methods=['POST'])
 def delete_gem():
     data = request.get_json()

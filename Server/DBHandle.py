@@ -67,14 +67,14 @@ def remove_mac(name):
 def get_vaults_by_type(user, type):
     with MongoClient(uri) as cluster:
         vaults = cluster['IdeaVaults']['Vaults']
-        return list(vaults.find({'user': user, 'type': type}))
+        return list(vaults.find({'host': user, 'type': type}))
 
 
 def check_if_new_vault(vault):
     with MongoClient(uri) as cluster:
         vaults = cluster['IdeaVaults']['Vaults']
         exists = bool(vaults.find_one({'title': vault.title,
-                                      'user': vault.user}))
+                                      'host': vault.host}))
         return not exists
 
 
@@ -82,32 +82,32 @@ def add_vault(vault):
     with MongoClient(uri) as cluster:
         vaults = cluster['IdeaVaults']['Vaults']
         vaults.insert_one({'title': vault.title, 'description': vault.description,
-                           'user': vault.user, 'type': vault.type})
+                           'host': vault.host, 'type': vault.type})
 
 
 def update_description(user, title, description):
     with MongoClient(uri) as cluster:
         vaults = cluster['IdeaVaults']['Vaults']
-        vaults.update_one({'user':user, 'title':title}, {'$set':{'description':description}})
-        return vaults.find_one({'user':user, 'title':title})
+        vaults.update_one({'host':user, 'title':title}, {'$set':{'description':description}})
+        return vaults.find_one({'host':user, 'title':title})
 
 
 def get_vault(user, title):
     with MongoClient(uri) as cluster:
         vaults = cluster['IdeaVaults']['Vaults']
-        return vaults.find_one({'user':user, 'title':title})
+        return vaults.find_one({'host':user, 'title':title})
 
 
 def get_gems(vault):
     with MongoClient(uri) as cluster:
         gems = cluster['IdeaVaults']['Gems']
-        return list(gems.find({'vault': vault.title, 'user': vault.user}))
+        return list(gems.find({'vault': vault.title, 'user': vault.host}))
 
 
 def check_if_existing_gem(user, vault, title):
     with MongoClient(uri) as cluster:
         gems = cluster['IdeaVaults']['Gems']
-        return bool(gems.find_one({'user': user, 'vault': vault, 'title': title}))
+        return bool(gems.find_one({'vault': vault, 'title': title}))
 
 
 def add_new_gem(user, vault, title, content):
@@ -125,4 +125,6 @@ def delete_gem(gem, vault):
 
 
 if __name__ == "__main__":
-    print(bool("False"))
+    with MongoClient(uri) as cluster:
+        vaults = cluster['IdeaVaults']['Vaults']
+        vaults.update_many({}, {'$rename': {'user': 'host'}})
