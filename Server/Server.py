@@ -103,7 +103,11 @@ def get_vaults_by_type(data, client):
     """
     pvaults = DBHandle.get_vaults_by_type(*data)
     for vault in pvaults:
-        vault_obj = obj.Vault(vault['title'], vault['host'], vault['description'], vault['type'])
+        if vault['type'] == 'shared':
+            vault_obj = obj.Vault(vault['title'], vault['host'], vault['description'], vault['type'],
+                              vault['collaborators'])
+        else:
+            vault_obj = obj.Vault(vault['title'], vault['host'], vault['description'], vault['type'])
         client.send(pickle.dumps(vault_obj))
         confirm = client.recv(1024).decode()
         if confirm != "next":

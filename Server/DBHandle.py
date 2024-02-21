@@ -133,4 +133,4 @@ def make_public(vault):
 if __name__ == "__main__":
     with MongoClient(uri) as cluster:
         vaults = cluster['IdeaVaults']['Vaults']
-        vaults.update_many({}, {'$rename': {'user': 'host'}})
+        vaults.update_many({'type':'shared'}, {'$set': {'collaborators': []}})
