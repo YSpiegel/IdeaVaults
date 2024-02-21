@@ -16,6 +16,10 @@
                         <div class="card-body">
                             <h5 class="card-title text-center">{{ vault.title }}</h5>
                             <p class="card-text text-center">{{vault.description}}</p>
+                            {% if type == 'shared'%}
+                            <hr>
+                            <p class="card-text text-center">Host: {{vault.host}}</p>
+                            {% endif %}
                             <div class="d-grid gap-2"><a
                                     href="/{{ type }}-vaults/{{vault.title}}"
                                     class="btn btn-primary">Enter</a></div>
