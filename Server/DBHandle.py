@@ -67,7 +67,13 @@ def remove_mac(name):
 def get_vaults_by_type(user, type):
     with MongoClient(uri) as cluster:
         vaults = cluster['IdeaVaults']['Vaults']
-        return list(vaults.find({'host': user, 'type': type}))
+        return list(vaults.find({
+            '$or': [
+                {'host': user},
+                {'collaborators': {'$in': [user]}},
+            ],
+            'type': type
+        }))
 
 
 def check_if_new_vault(vault):
