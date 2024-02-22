@@ -87,7 +87,11 @@ def check_if_new_vault(vault):
 def add_vault(vault):
     with MongoClient(uri) as cluster:
         vaults = cluster['IdeaVaults']['Vaults']
-        vaults.insert_one({'title': vault.title, 'description': vault.description,
+        if vault.type == "shared":
+            vaults.insert_one({'title': vault.title, 'description': vault.description,
+                               'host': vault.host, 'type': vault.type, 'collaborators': []})
+        else:
+            vaults.insert_one({'title': vault.title, 'description': vault.description,
                            'host': vault.host, 'type': vault.type})
 
 
