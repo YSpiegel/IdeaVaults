@@ -47,7 +47,8 @@ function getIdTitle(title) {
                     Make Public</a></li>
                 {% else %}
                 {% if user == vault.owner or user in vault.collaborators.coowner %}
-                <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">
+                <li class="nav-item"><a class="nav-link active" aria-current="page"
+                                        data-bs-toggle="offcanvas" href="#usersOffcanvas">
                     Manage Users</a></li>
                 {% endif %}
                 {% if user == vault.owner %}
@@ -97,7 +98,6 @@ function getIdTitle(title) {
     </div>
     {% endfor %}
     </div>
-    </div>
 </div>
 <div class="modal fade"  id="descriptionModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -140,6 +140,57 @@ function getIdTitle(title) {
         </div>
     </div>
 </div>
+<div class="offcanvas offcanvas-start" data-bs-backdrop="static" tabindex="-1" id="usersOffcanvas" aria-labelledby="staticBackdropLabel">
+  <div class="offcanvas-header">
+    <h3 class="offcanvas-title" id="staticBackdropLabel">Users in the vault</h3>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+      <ul class="list-group list-group-flush">
+          <li class="list-group-item">
+            Owner: {{vault.owner}}
+          </li>
+          <li class="list-group-item">
+              {% if vault.collaborators.coowner %}
+              Co-owners:
+                <ul class="list-group">
+                    {% for coowner in vault.collaborators.coowner %}
+                    <li class="list-group-item">{{coowner}}</li>
+                    {% endfor %}
+                </ul>
+              {% else %}
+              Co-owners: None
+              {% endif %}
+          </li>
+          <li class="list-group-item">
+              {% if vault.collaborators.contributor %}
+              Contributors:
+                <ul class="list-group">
+                    {% for contributor in vault.collaborators.contributor %}
+                    <li class="list-group-item">{{contributor}}</li>
+                    {% endfor %}
+                </ul>
+              {% else %}
+              Contributors: None
+              {% endif %}
+          </li>
+          <li class="list-group-item">
+              {% if vault.collaborators.guest %}
+              Guests:
+                <ul class="list-group">
+                    {% for guest in vault.collaborators.guest %}
+                    <li class="list-group-item">{{guest}}</li>
+                    {% endfor %}
+                </ul>
+              {% else %}
+              Guests: None
+              {% endif %}
+          </li>
+        </ul>
+
+  </div>
+</div>
+
 
 <script id="add-gem-events">
 
