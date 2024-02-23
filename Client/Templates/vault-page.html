@@ -46,10 +46,14 @@ function getIdTitle(title) {
                 <li class="nav-item"><a class="nav-link active" aria-current="page" href="/making-{{vault.title}}-public">
                     Make Public</a></li>
                 {% else %}
+                {% if user == vault.owner or user in vault.collaborators.coowner %}
                 <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">
                     Manage Users</a></li>
+                {% endif %}
+                {% if user == vault.owner %}
                 <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">
                     Produce Shared Key</a></li>
+                {% endif %}
                 {% endif %}
             </ul>
         </div>
