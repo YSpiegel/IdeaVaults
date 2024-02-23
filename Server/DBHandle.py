@@ -69,7 +69,7 @@ def get_vaults_by_type(user, type):
         vaults = cluster['IdeaVaults']['Vaults']
         return list(vaults.find({
             '$or': [
-                {'host': user},
+                {'owner': user},
                 {'collaborators': {'$in': [user]}},
             ],
             'type': type
@@ -80,7 +80,7 @@ def check_if_new_vault(vault):
     with MongoClient(uri) as cluster:
         vaults = cluster['IdeaVaults']['Vaults']
         exists = bool(vaults.find_one({'title': vault.title,
-                                      'host': vault.host}))
+                                      'owner': vault.owner}))
         return not exists
 
 
@@ -89,29 +89,29 @@ def add_vault(vault):
         vaults = cluster['IdeaVaults']['Vaults']
         if vault.type == "shared":
             vaults.insert_one({'title': vault.title, 'description': vault.description,
-                               'host': vault.host, 'type': vault.type, 'collaborators': []})
+                               'owner': vault.owner, 'type': vault.type, 'collaborators': []})
         else:
             vaults.insert_one({'title': vault.title, 'description': vault.description,
-                           'host': vault.host, 'type': vault.type})
+                           'owner': vault.owner, 'type': vault.type})
 
 
 def update_description(user, title, description):
     with MongoClient(uri) as cluster:
         vaults = cluster['IdeaVaults']['Vaults']
-        vaults.update_one({'host':user, 'title':title}, {'$set':{'description':description}})
-        return vaults.find_one({'host':user, 'title':title})
+        vaults.update_one({'owner':user, 'title':title}, {'$set':{'description':description}})
+        return vaults.find_one({'owner':user, 'title':title})
 
 
 def get_vault(user, title):
     with MongoClient(uri) as cluster:
         vaults = cluster['IdeaVaults']['Vaults']
-        return vaults.find_one({'host':user, 'title':title})
+        return vaults.find_one({'owner':user, 'title':title})
 
 
 def get_gems(vault):
     with MongoClient(uri) as cluster:
         gems = cluster['IdeaVaults']['Gems']
-        return list(gems.find({'vault': vault.title, 'user': vault.host}))
+        return list(gems.find({'vault': vault.title, 'user': vault.owner}))
 
 
 def check_if_existing_gem(user, vault, title):
@@ -143,4 +143,4 @@ def make_public(vault):
 if __name__ == "__main__":
     with MongoClient(uri) as cluster:
         vaults = cluster['IdeaVaults']['Vaults']
-        vaults.update_many({'type':'shared'}, {'$set': {'collaborators': []}})
+        vaults.update_many({}, {'$rename': {'host': 'owner'}})

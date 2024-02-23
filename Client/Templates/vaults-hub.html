@@ -18,7 +18,7 @@
                             <p class="card-text text-center">{{vault.description}}</p>
                             {% if type == 'shared'%}
                             <hr>
-                            <p class="card-text text-center">Host: {{vault.host}}</p>
+                            <p class="card-text text-center">Owner: {{vault.owner}}</p>
                             {% endif %}
                             <div class="d-grid gap-2"><a
                                     href="/{{ type }}-vaults/{{vault.title}}"

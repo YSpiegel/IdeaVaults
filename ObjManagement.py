@@ -37,9 +37,9 @@ def string_preview(text, max_width_rems, font_height_pixels):
 
 
 class Vault:
-    def __init__(self, title, host, description, type, collaborators=None):
+    def __init__(self, title, owner, description, type, collaborators=None):
         self.title = title
-        self.host = host
+        self.owner = owner
         self.description = description
         self.type = type
         if collaborators is not None:
