@@ -70,7 +70,9 @@ def get_vaults_by_type(user, type):
         return list(vaults.find({
             '$or': [
                 {'owner': user},
-                {'collaborators': {'$in': [user]}},
+                {'collaborators.co-owner': {'$in': [user]}},
+                {'collaborators.contributor': {'$in': [user]}},
+                {'collaborators.guest': {'$in': [user]}}
             ],
             'type': type
         }))
@@ -89,7 +91,8 @@ def add_vault(vault):
         vaults = cluster['IdeaVaults']['Vaults']
         if vault.type == "shared":
             vaults.insert_one({'title': vault.title, 'description': vault.description,
-                               'owner': vault.owner, 'type': vault.type, 'collaborators': []})
+                               'owner': vault.owner, 'type': vault.type,
+                               'collaborators': {'co-owner': [], 'contributor': [], 'guest': []}})
         else:
             vaults.insert_one({'title': vault.title, 'description': vault.description,
                            'owner': vault.owner, 'type': vault.type})
@@ -137,10 +140,13 @@ def delete_gem(gem, vault):
 def make_public(vault):
     with MongoClient(uri) as cluster:
         vaults = cluster['IdeaVaults']['Vaults']
-        vaults.update_one({'title': vault}, {'$set': {'type': "shared", 'collaborators': []}})
+        vaults.update_one({'title': vault},
+                          {'$set': {'type': "shared",
+                                      'collaborators': {'co-owner': [], 'contributor': [], 'guest': []}}})
 
 
 if __name__ == "__main__":
     with MongoClient(uri) as cluster:
         vaults = cluster['IdeaVaults']['Vaults']
-        vaults.update_many({}, {'$rename': {'host': 'owner'}})
+        vaults.update_many({'type': 'shared'},
+                           {'$set': {'collaborators': {'co-owner': [], 'contributor': [], 'guest': []}}})

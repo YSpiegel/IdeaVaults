@@ -76,7 +76,12 @@ def search_vault(vault_title, client):
     """
     vault = DBHandle.find_by_title(vault_title)
     if vault:
-        client.send(pickle.dumps(obj.Vault(vault['title'], vault['owner'], vault['description'], vault['type'])))
+        if vault['type'] == 'shared':
+            vault_obj = obj.Vault(vault['title'], vault['owner'], vault['description'], vault['type'],
+                                  vault['collaborators'])
+        else:
+            vault_obj = obj.Vault(vault['title'], vault['owner'], vault['description'], vault['type'])
+        client.send(pickle.dumps(vault_obj))
     else:
         client.send("@".encode())
 
