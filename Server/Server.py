@@ -177,6 +177,10 @@ def make_public(data, client):
     DBHandle.make_public(data)
 
 
+def produce_key(data, client):
+    client.send("EHK6BE7".encode())
+
+
 def act(action, data, client):
     actions = {"adduser": adduser,
                "sign-in": sign_in,
@@ -192,7 +196,8 @@ def act(action, data, client):
                "delete-gem-from-vault": delete_gem_from_vault,
                "add-gem-to-vault": add_gem_to_vault,
                "gem-title-validation": gem_title_validation,
-               "make-public": make_public}
+               "make-public": make_public,
+               "produce-shared-key": produce_key}
 
     actions[action](data, client)
 

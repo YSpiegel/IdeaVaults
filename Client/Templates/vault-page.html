@@ -40,9 +40,9 @@ function getIdTitle(title) {
                                         data-bs-toggle="modal" data-bs-target="#newGemModal">
                     Add New Gem</a></li>
                 {% endif %}
-                <li class="nav-item dropdown"><a class="nav-link active" aria-current="page" data-group="mainnavbar"
-                                                 data-bs-toggle="dropdown" href="">
-                    Search The Vault</a>
+                <li class="nav-item dropdown">
+                    <a class="nav-link active" aria-current="page" data-group="mainnavbar" data-bs-toggle="dropdown"
+                       href="">Search The Vault</a>
                     <ul class="dropdown-menu">
                         <li class="text-center">Search by title:</li>
                         <li><nav class="navbar bg-body-tertiary">
@@ -79,7 +79,8 @@ function getIdTitle(title) {
                     Manage Users</a></li>
                 {% endif %}
                 {% if user == vault.owner %}
-                <li class="nav-item"><a class="nav-link active" aria-current="page" href="#" data-group="mainnavbar">
+                <li class="nav-item"><a class="nav-link active" aria-current="page" href="#" data-group="mainnavbar"
+                    data-bs-toggle="modal" data-bs-target="#sharedKeyModal" id="openSharedKeyModal">
                     Produce Shared Key</a></li>
                 {% endif %}
                 {% endif %}
@@ -127,7 +128,8 @@ function getIdTitle(title) {
     {% endfor %}
     </div>
 </div>
-<div class="modal fade"  id="descriptionModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+<div class="modal fade" id="descriptionModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -146,7 +148,7 @@ function getIdTitle(title) {
         </div>
     </div>
 </div>
-<div class="modal fade"  id="newGemModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="newGemModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -168,59 +170,6 @@ function getIdTitle(title) {
         </div>
     </div>
 </div>
-{% if vault.type == "shared" %}
-<div class="offcanvas offcanvas-start" data-bs-backdrop="static" tabindex="-1" id="usersOffcanvas"
-     aria-labelledby="staticBackdropLabel">
-  <div class="offcanvas-header">
-    <h3 class="offcanvas-title" id="staticBackdropLabel">Users in the vault</h3>
-    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body">
-      <ul class="list-group list-group-flush">
-          <li class="list-group-item">
-            Owner: {{vault.owner}}
-          </li>
-          <li class="list-group-item">
-              {% if vault.collaborators.coowner %}
-              Co-owners:
-                <ul class="list-group list-group-flush">
-                    {% for coowner in vault.collaborators.coowner %}
-                    <li class="list-group-item">{{coowner}}</li>
-                    {% endfor %}
-                </ul>
-              {% else %}
-              Co-owners: None
-              {% endif %}
-          </li>
-          <li class="list-group-item">
-              {% if vault.collaborators.contributor %}
-              Contributors:
-                <ul class="list-group list-group-flush">
-                    {% for contributor in vault.collaborators.contributor %}
-                    <li class="list-group-item">{{contributor}}</li>
-                    {% endfor %}
-                </ul>
-              {% else %}
-              Contributors: None
-              {% endif %}
-          </li>
-          <li class="list-group-item">
-              {% if vault.collaborators.guest %}
-              Guests:
-                <ul class="list-group list-group-flush">
-                    {% for guest in vault.collaborators.guest %}
-                    <li class="list-group-item">{{guest}}</li>
-                    {% endfor %}
-                </ul>
-              {% else %}
-              Guests: None
-              {% endif %}
-          </li>
-        </ul>
-
-  </div>
-</div>
-{% endif %}
 
 <script id="add-gem-events">
 
@@ -552,4 +501,142 @@ const navItems = document.querySelectorAll('[data-group="mainnavbar"]');
 
   window.addEventListener('resize', spreadItems);
 </script>
+
+
+{% if vault.type == "shared" %}
+<div class="offcanvas offcanvas-start" data-bs-backdrop="static" tabindex="-1" id="usersOffcanvas"
+     aria-labelledby="staticBackdropLabel">
+  <div class="offcanvas-header">
+    <h3 class="offcanvas-title" id="staticBackdropLabel">Users in the vault</h3>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+      <ul class="list-group list-group-flush">
+          <li class="list-group-item">
+            Owner: {{vault.owner}}
+          </li>
+          <li class="list-group-item">
+              {% if vault.collaborators.coowner %}
+              Co-owners:
+                <ul class="list-group list-group-flush">
+                    {% for coowner in vault.collaborators.coowner %}
+                    <li class="list-group-item">{{coowner}}</li>
+                    {% endfor %}
+                </ul>
+              {% else %}
+              Co-owners: None
+              {% endif %}
+          </li>
+          <li class="list-group-item">
+              {% if vault.collaborators.contributor %}
+              Contributors:
+                <ul class="list-group list-group-flush">
+                    {% for contributor in vault.collaborators.contributor %}
+                    <li class="list-group-item">{{contributor}}</li>
+                    {% endfor %}
+                </ul>
+              {% else %}
+              Contributors: None
+              {% endif %}
+          </li>
+          <li class="list-group-item">
+              {% if vault.collaborators.guest %}
+              Guests:
+                <ul class="list-group list-group-flush">
+                    {% for guest in vault.collaborators.guest %}
+                    <li class="list-group-item">{{guest}}</li>
+                    {% endfor %}
+                </ul>
+              {% else %}
+              Guests: None
+              {% endif %}
+          </li>
+        </ul>
+
+  </div>
+</div>
+<div class="modal fade" id="sharedKeyModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Shared Key</h1>
+                <button type="button" class="btn-close" id="closeSharedKey" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <h1 id="keyValue">Key</h1>
+                <h3 id="keyStatus">Key will expire in: 3:00</h3>
+            </div>
+            <div class="modal-footer">
+
+            </div>
+        </div>
+    </div>
+</div>
+<script id="shared-key-events">
+
+let countdownRunning = false;
+
+function startCountdown(){
+    let timeLeft = 179; // 3 minutes in seconds (One counted upon opening the modal)
+    const keyStatus = document.getElementById('keyStatus');
+
+    const interval = setInterval(() => {
+        if(timeLeft <= 0) {
+            clearInterval(interval);
+            keyStatus.textContent = 'Key has expired';
+            countdownRunning = false;
+        } else {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            keyStatus.textContent = `Key will expire in: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            timeLeft--;
+        }
+    }, 1000);
+};
+
+
+function produceKey() {
+    fetch('/produce-shared-key', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            vaultTitle: '{{vault.title}}'
+        })
+    })
+    .then(response => {
+        if (response.status == 200) {
+            startCountdown();
+            response.text() // Assuming the response is text, use response.json() if it's JSON
+            .then(data => {
+                const keyValue = document.getElementById('keyValue');
+                keyValue.textContent = data; // Assuming data is the value you want to display
+            })
+            .catch(error => {
+                console.error('Error while parsing response body:', error);
+            });
+        } else {
+            throw new Error('Failed to fetch shared key');
+        }
+    })
+    .catch(error => {
+        console.log('Error:', error);
+    });
+}
+
+
+const openSharedKey = document.getElementById('openSharedKeyModal');
+
+
+openSharedKey.addEventListener('click', () => {
+  if (!countdownRunning) {
+    countdownRunning = true;
+    produceKey();
+  }
+});
+</script>
+
+{% endif %}
+
 {% endblock %}

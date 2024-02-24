@@ -300,6 +300,15 @@ def make_public(vault):
     return redirect(f'/shared-vaults/{vault}')
 
 
+@app.route('/produce-shared-key', methods=["POST"])
+def produce_key():
+    data = request.get_json()
+    vault_title = data['vaultTitle']
+    client = open_con("produce-shared-key", vault_title)
+    key = client.recv(1024).decode()
+    return key
+
+
 @app.route("/sign-out")
 def sign_out():
     client_socket = open_con("remove-mac", get_mac_address())
