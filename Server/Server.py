@@ -77,8 +77,12 @@ def search_vault(vault_title, client):
     vault = DBHandle.find_by_title(vault_title)
     if vault:
         if vault['type'] == 'shared':
-            vault_obj = obj.Vault(vault['title'], vault['owner'], vault['description'], vault['type'],
-                                  vault['collaborators'])
+            if 'pending' in vault:
+                vault_obj = obj.Vault(vault['title'], vault['owner'], vault['description'], vault['type'],
+                                      vault['collaborators'], vault['pending'])
+            else:
+                vault_obj = obj.Vault(vault['title'], vault['owner'], vault['description'], vault['type'],
+                                      vault['collaborators'])
         else:
             vault_obj = obj.Vault(vault['title'], vault['owner'], vault['description'], vault['type'])
         client.send(pickle.dumps(vault_obj))

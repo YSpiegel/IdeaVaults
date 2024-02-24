@@ -506,12 +506,12 @@ const navItems = document.querySelectorAll('[data-group="mainnavbar"]');
 {% if vault.type == "shared" %}
 <div class="offcanvas offcanvas-start" data-bs-backdrop="static" tabindex="-1" id="usersOffcanvas"
      aria-labelledby="staticBackdropLabel">
-  <div class="offcanvas-header">
+    <div class="offcanvas-header">
     <h3 class="offcanvas-title" id="staticBackdropLabel">Users in the vault</h3>
     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body">
-      <ul class="list-group list-group-flush">
+    </div>
+    <div class="offcanvas-body">
+        <ul class="list-group list-group-flush">
           <li class="list-group-item">
             Owner: {{vault.owner}}
           </li>
@@ -552,7 +552,38 @@ const navItems = document.querySelectorAll('[data-group="mainnavbar"]');
               {% endif %}
           </li>
         </ul>
-
+        {% if vault.pending %}
+        <br><br>
+        <h4>Pending:</h4>
+        <ul class="list-group list-group-flush">
+        {% for user in vault.pending %}
+            <li class="list-group-item">
+                <nav class="navbar navbar-expand-lg navbar-light bg-light mt-3">
+                  <div class="collapse navbar-collapse">
+                    <ul class="navbar-nav mx-auto mb-2 mb-lg-0" style="font-size: 18px;">
+                      <li class="nav-item p-3">
+                        <h5>{{user}}</h5>
+                      </li>
+                      <li class="nav-item p-3">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            Accept
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item">Guest</a></li>
+                            <li><a class="dropdown-item">Contributor</a></li>
+                            <li><a class="dropdown-item">Co-owner</a></li>
+                        </ul>
+                      </li>
+                      <li class="nav-item p-3">
+                        <button class="nav-item btn btn-danger">Deny</button>
+                      </li>
+                    </ul>
+                  </div>
+                </nav>
+            </li>
+        {% endfor %}
+        </ul>
+        {% endif %}
   </div>
 </div>
 <div class="modal fade" id="sharedKeyModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
