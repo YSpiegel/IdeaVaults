@@ -203,11 +203,20 @@ def new_vault():
     return render_template('new-vault.html', user=user, type=type)
 
 
-@app.route('/<type>-vaults/<vault>')
+@app.route('/<type>-vaults/<vault>', methods=["GET", "POST"])
 def vault_page(type, vault):
     user = get_user()
     vault = get_vault(vault)
     gems = get_vault_gems(vault)
+
+    if request.method == "POST":
+        if 'searchtitle' in request.form:
+            search = request.form['searchtitle']
+            gems = [gem for gem in gems if search in gem.title]
+        elif 'searchcontent' in request.form:
+            search = request.form['searchcontent']
+            gems = [gem for gem in gems if search in gem.content]
+
     if vault.is_in_vault(user):
         return render_template('vault-page.html', user=user, vault=vault, gems=gems)
     return redirect(url_for('no_access', user=user, title=vault.title))

@@ -32,29 +32,54 @@ function getIdTitle(title) {
     <nav class="navbar navbar-expand-lg navbar-light bg-light mt-3" id="vault-navbar">
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 justify-content-center">
-                <li class="nav-item"><a class="nav-link active" aria-current="page" href=""
+                <li class="nav-item"><a class="nav-link active" aria-current="page" href="" data-group="mainnavbar"
                                         data-bs-toggle="modal" data-bs-target="#descriptionModal">
                     Description</a></li>
                 {% if vault.type == "private" or (vault.type == "shared" and user not in vault.collaborators.guest) %}
-                <li class="nav-item"><a class="nav-link active" aria-current="page" href=""
+                <li class="nav-item"><a class="nav-link active" aria-current="page" href="" data-group="mainnavbar"
                                         data-bs-toggle="modal" data-bs-target="#newGemModal">
                     Add New Gem</a></li>
                 {% endif %}
-                <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">
-                    Search The Vault</a></li>
-                <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">
+                <li class="nav-item dropdown"><a class="nav-link active" aria-current="page" data-group="mainnavbar"
+                                                 data-bs-toggle="dropdown" href="">
+                    Search The Vault</a>
+                    <ul class="dropdown-menu">
+                        <li class="text-center">Search by title:</li>
+                        <li><nav class="navbar bg-body-tertiary">
+                          <div class="container-fluid">
+                            <form class="d-flex" role="search" method="POST">
+                              <input class="form-control me-2" type="search"
+                                     placeholder="Search" aria-label="Search" name="searchtitle">
+                              <button class="btn btn-outline-success" type="submit">Search</button>
+                            </form>
+                          </div>
+                        </nav></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li class="text-center">Search by content:</li>
+                        <li><nav class="navbar bg-body-tertiary">
+                          <div class="container-fluid">
+                            <form class="d-flex" role="search" method="POST">
+                              <input class="form-control me-2" type="search"
+                                     placeholder="Search" aria-label="Search" name="searchcontent">
+                              <button class="btn btn-outline-success" type="submit">Search</button>
+                            </form>
+                          </div>
+                        </nav></li>
+                    </ul>
+                </li>
+                <li class="nav-item"><a class="nav-link active" aria-current="page" href="#" data-group="mainnavbar">
                     Filter contents</a></li>
                 {% if vault.type == "private" %}
-                <li class="nav-item"><a class="nav-link active" aria-current="page" href="/making-{{vault.title}}-public">
-                    Make Public</a></li>
+                <li class="nav-item"><a class="nav-link active" aria-current="page" data-group="mainnavbar"
+                                        href="/making-{{vault.title}}-public">Make Public</a></li>
                 {% else %}
                 {% if user == vault.owner or user in vault.collaborators.coowner %}
-                <li class="nav-item"><a class="nav-link active" aria-current="page"
+                <li class="nav-item"><a class="nav-link active" aria-current="page" data-group="mainnavbar"
                                         data-bs-toggle="offcanvas" href="#usersOffcanvas">
                     Manage Users</a></li>
                 {% endif %}
                 {% if user == vault.owner %}
-                <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">
+                <li class="nav-item"><a class="nav-link active" aria-current="page" href="#" data-group="mainnavbar">
                     Produce Shared Key</a></li>
                 {% endif %}
                 {% endif %}
@@ -510,7 +535,7 @@ description.addEventListener('input', () => {
 </script>
 <script id="spread-navbar">
 const nav = document.getElementById('vault-navbar');
-  const navItems = nav.querySelectorAll('li');
+const navItems = document.querySelectorAll('[data-group="mainnavbar"]');
 
   function spreadItems() {
     const navWidth = nav.offsetWidth;
@@ -526,6 +551,5 @@ const nav = document.getElementById('vault-navbar');
   spreadItems();
 
   window.addEventListener('resize', spreadItems);
-
 </script>
 {% endblock %}
