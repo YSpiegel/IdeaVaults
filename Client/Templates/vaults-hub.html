@@ -95,9 +95,11 @@
 </div>
 
 <script id="joining-by-key">
+const sendKeyButton = document.getElementById('sendKeyRequest');
+const keyInput = document.getElementById('keyInput');
+const label = document.getElementById('keyInputLabel');
+
 function handleSendKeyRequest() {
-    const keyInput = document.getElementById('keyInput');
-    const label = document.getElementById('keyInputLabel');
 
     fetch('/send-key-request', {
         method: 'POST',
@@ -113,6 +115,7 @@ function handleSendKeyRequest() {
         if (response.status === 200) {
             keyInput.hidden = true;
             label.textContent = "Your request is now pending";
+            sendKeyButton.textContent = "Send Another Request";
         } else if (response.status === 409) {
             label.textContent = "You entered an invalid key, check again";
         }
@@ -122,9 +125,17 @@ function handleSendKeyRequest() {
     });
 }
 
-const sendKeyButton = document.getElementById('sendKeyRequest');
 
-sendKeyButton.addEventListener('click', handleSendKeyRequest);
+sendKeyButton.addEventListener('click', () =>
+    {
+    if (sendKeyButton.textContent == "Send Request") { handleSendKeyRequest(); }
+    else {
+    sendKeyButton.textContent = "Send Request";
+    keyInput.hidden = false;
+    keyInput.value = "";
+    label.textContent = "Enter the key to the vault you wish to join:";
+    }
+    });
 </script>
 
 {% endblock %}
