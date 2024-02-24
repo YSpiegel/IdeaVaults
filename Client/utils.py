@@ -1,4 +1,4 @@
-import datetime
+import datetime, random, string
 
 
 def get_greeting():
@@ -12,5 +12,15 @@ def get_greeting():
     return greeting
 
 
+def create_key(length):
+    key = ""
+    chars = string.digits + string.ascii_uppercase
+
+    for _ in range(length):
+        key += chars[random.randint(0, len(chars) - 1)]
+
+    return key
+
+
 if __name__ == "__main__":
-    pass
+    print(create_key(7))

@@ -178,7 +178,8 @@ def make_public(data, client):
 
 
 def produce_key(data, client):
-    client.send("EHK6BE7".encode())
+    vault_title, key = data
+    DBHandle.add_key_to_vault(vault_title, key)
 
 
 def act(action, data, client):

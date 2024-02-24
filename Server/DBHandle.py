@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 import ObjManagement as obj
+import time
 
 uri = "mongodb+srv://yoavsp:y0avdb7@cluster1.jebb6i6.mongodb.net/?retryWrites=true&w=majority"
 
@@ -143,6 +144,14 @@ def make_public(vault):
         vaults.update_one({'title': vault},
                           {'$set': {'type': "shared",
                                       'collaborators': {'coowner': [], 'contributor': [], 'guest': []}}})
+
+
+def add_key_to_vault(vault_title, key):
+    with MongoClient(uri) as cluster:
+        vaults = cluster['IdeaVaults']['Vaults']
+        vaults.update_one({'title': vault_title}, {'$set': {'key': key}})
+        time.sleep(180)
+        vaults.update_one({'title': vault_title}, {'$unset': {'key': ""}})
 
 
 if __name__ == "__main__":

@@ -32,6 +32,7 @@ def get_user():
 def get_vault(title):
     client_socket = open_con("get-vault-by-title", title)
     vault = client_socket.recv(1024)
+    client_socket.close()
     return pickle.loads(vault) if vault != b'@' else ""
 
 
@@ -297,6 +298,7 @@ def delete_gem():
 @app.route('/making-<vault>-public')
 def make_public(vault):
     client = open_con("make-public", vault)
+    client.close()
     return redirect(f'/shared-vaults/{vault}')
 
 
@@ -304,8 +306,9 @@ def make_public(vault):
 def produce_key():
     data = request.get_json()
     vault_title = data['vaultTitle']
-    client = open_con("produce-shared-key", vault_title)
-    key = client.recv(1024).decode()
+    key = utils.create_key(7)
+    client = open_con("produce-shared-key", (vault_title, key))
+    client.close()
     return key
 
 
