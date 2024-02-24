@@ -182,6 +182,15 @@ def produce_key(data, client):
     DBHandle.add_key_to_vault(vault_title, key)
 
 
+def key_check_and_pend(data, client):
+    key, user = data
+    if DBHandle.check_if_key_exists(key):
+        DBHandle.register_by_key(key, user)
+        client.send("200".encode())
+    else:
+        client.send("409".encode())
+
+
 def act(action, data, client):
     actions = {"adduser": adduser,
                "sign-in": sign_in,
@@ -198,7 +207,8 @@ def act(action, data, client):
                "add-gem-to-vault": add_gem_to_vault,
                "gem-title-validation": gem_title_validation,
                "make-public": make_public,
-               "produce-shared-key": produce_key}
+               "produce-shared-key": produce_key,
+               "check-key-and-pend-request": key_check_and_pend}
 
     actions[action](data, client)
 

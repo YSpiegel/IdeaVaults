@@ -312,6 +312,19 @@ def produce_key():
     return key
 
 
+@app.route('/send-key-request', methods=['POST'])
+def send_key_request():
+    data = request.get_json()
+    key = data['key']
+    user = data['user']
+
+    client_socket = open_con("check-key-and-pend-request", (key, user))
+    response = int(client_socket.recv(1024).decode())
+    client_socket.close()
+
+    return '', response
+
+
 @app.route("/sign-out")
 def sign_out():
     client_socket = open_con("remove-mac", get_mac_address())

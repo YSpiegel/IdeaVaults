@@ -154,6 +154,22 @@ def add_key_to_vault(vault_title, key):
         vaults.update_one({'title': vault_title}, {'$unset': {'key': ""}})
 
 
+def check_if_key_exists(key):
+    with MongoClient(uri) as cluster:
+        vaults = cluster['IdeaVaults']['Vaults']
+        return bool(vaults.find_one({'key': key}))
+
+
+def register_by_key(key, user):
+    with MongoClient(uri) as cluster:
+        vaults = cluster['IdeaVaults']['Vaults']
+        if 'pending' in vaults.find_one({'key': key}):
+            if user not in vaults.find_one({'key': key})['pending']:
+                vaults.update_one({'key': key}, {'$push': {'pending': user}})
+        else:
+            vaults.update_one({'key': key}, {'$set': {'pending': [user]}})
+
+
 if __name__ == "__main__":
     with MongoClient(uri) as cluster:
         vaults = cluster['IdeaVaults']['Vaults']

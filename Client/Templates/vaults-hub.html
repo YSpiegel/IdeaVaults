@@ -4,7 +4,13 @@
 
 {% block content %}
 <div class="container justify-content-center">
-    <h1>{{ user }}'s {{type}} vaults</h1>
+    <div class="row align-items-start">
+        <div class="col"><h1>{{ user }}'s {{type}} vaults</h1></div>
+        {% if type == "shared" %}
+        <div class="col" style="text-align: right"><a class="btn btn-success"
+                   data-bs-toggle="modal" data-bs-target="#enterKeyModal">Join a vault</a></div>
+        {% endif %}
+    </div>
     <div id="vaultscarousel" class="carousel slide">
 
         <div class="carousel-inner">
@@ -69,4 +75,56 @@
         data-bs-slide-to="{{vaults.length}}">Create new vault</button>
     --></div>
 </div>
+
+<div class="modal fade" id="enterKeyModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Join by key</h1>
+                <button type="button" class="btn-close" id="closeEnterKey" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <h4 id="keyInputLabel">Enter the key to the vault you wish to join:</h4>
+                <input type="text" class="form-control text-center" id="keyInput">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" id="sendKeyRequest">Send Request</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script id="joining-by-key">
+function handleSendKeyRequest() {
+    const keyInput = document.getElementById('keyInput');
+    const label = document.getElementById('keyInputLabel');
+
+    fetch('/send-key-request', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            key: keyInput.value, // Changed from textContent to value
+            user: '{{user}}'
+        })
+    })
+    .then(response => {
+        if (response.status === 200) {
+            keyInput.hidden = true;
+            label.textContent = "Your request is now pending";
+        } else if (response.status === 409) {
+            label.textContent = "You entered an invalid key, check again";
+        }
+    })
+    .catch(error => {
+        console.log('Error:', error);
+    });
+}
+
+const sendKeyButton = document.getElementById('sendKeyRequest');
+
+sendKeyButton.addEventListener('click', handleSendKeyRequest);
+</script>
+
 {% endblock %}
