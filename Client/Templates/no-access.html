@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid text-center">
+  <h1>No Access!</h1>
+  <br>
+  <h3>You don't seem to have access to this vault,
+  please contact {{vault.owner}} to get access</h3>
+  <br>
+  <a class="btn btn-primary" href="/{{vault.type}}-vaults">Return to your {{vault.type}} vaults</a>
+</div>
+
+
+{% endblock %}

@@ -45,8 +45,11 @@ class Vault:
         if collaborators is not None:
             self.collaborators = collaborators
 
-    def __str__(self):
-        return f"{self.title}|||{self.user}|||{self.description}|||{self.type}"
+    def is_in_vault(self, user):
+        if not getattr(self, 'collaborators', None):
+            return user == self.owner
+        return user == self.owner or user in self.collaborators.guest or \
+            user in self.collaborators.contributor or user in self.collaborators.coowner
 
 
 def vaultfromstr(str):

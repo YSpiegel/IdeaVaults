@@ -2,7 +2,7 @@ import ObjManagement as obj
 import utils, crypt
 
 from flask import Flask, render_template, request, url_for, redirect, send_from_directory, jsonify
-import socket, pickle, uuid
+import socket, pickle, uuid, ast
 
 app = Flask(__name__)
 
@@ -208,7 +208,15 @@ def vault_page(type, vault):
     user = get_user()
     vault = get_vault(vault)
     gems = get_vault_gems(vault)
-    return render_template('vault-page.html', user=user, vault=vault, gems=gems)
+    if vault.is_in_vault(user):
+        return render_template('vault-page.html', user=user, vault=vault, gems=gems)
+    return redirect(url_for('no_access', user=user, title=vault.title))
+
+
+@app.route('/no-access/<user>/<title>')
+def no_access(user, title):
+    vault = get_vault(title)
+    return render_template('no-access.html', user=user, vault=vault)
 
 
 @app.route('/update-description', methods=['POST'])

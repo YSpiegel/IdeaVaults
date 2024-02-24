@@ -35,9 +35,11 @@ function getIdTitle(title) {
                 <li class="nav-item"><a class="nav-link active" aria-current="page" href=""
                                         data-bs-toggle="modal" data-bs-target="#descriptionModal">
                     Description</a></li>
+                {% if vault.type == "private" or (vault.type == "shared" and user not in vault.collaborators.guest) %}
                 <li class="nav-item"><a class="nav-link active" aria-current="page" href=""
                                         data-bs-toggle="modal" data-bs-target="#newGemModal">
                     Add New Gem</a></li>
+                {% endif %}
                 <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">
                     Search The Vault</a></li>
                 <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">
@@ -141,6 +143,7 @@ function getIdTitle(title) {
         </div>
     </div>
 </div>
+{% if vault.type == "shared" %}
 <div class="offcanvas offcanvas-start" data-bs-backdrop="static" tabindex="-1" id="usersOffcanvas"
      aria-labelledby="staticBackdropLabel">
   <div class="offcanvas-header">
@@ -192,7 +195,7 @@ function getIdTitle(title) {
 
   </div>
 </div>
-
+{% endif %}
 
 <script id="add-gem-events">
 
