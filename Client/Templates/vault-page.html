@@ -616,6 +616,25 @@ const navItems = document.querySelectorAll('[data-group="mainnavbar"]');
                 console.log('Error:', error);
             });
         };
+
+
+        function denyCollaborator(user) {
+            fetch('/deny-collaborator', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    user: user, vault: '{{vault.title}}'
+                })
+            })
+            .then(response => {
+                
+            })
+            .catch(error => {
+                console.log('Error:', error);
+            });
+        };
         </script>
         {% if vault.pending %}
         <br><br>
@@ -640,7 +659,7 @@ const navItems = document.querySelectorAll('[data-group="mainnavbar"]');
                         </ul>
                       </li>
                       <li class="nav-item p-3">
-                        <button class="nav-item btn btn-danger">Deny</button>
+                        <button id="deny{{loop.index}}" class="nav-item btn btn-danger">Deny</button>
                       </li>
                     </ul>
                   </div>
@@ -664,6 +683,13 @@ const navItems = document.querySelectorAll('[data-group="mainnavbar"]');
 
                 coownerBtn.addEventListener('click', () => {
                 addCollaborator('{{user}}', 'Co-owner');
+                userItem.remove();
+                });
+
+                const denyBtn = document.getElementById('deny{{loop.index}}');
+
+                denyBtn.addEventListener('click', () => {
+                denyCollaborator('{{user}}');
                 userItem.remove();
                 });
             </script>

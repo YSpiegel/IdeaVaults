@@ -177,6 +177,12 @@ def remove_pend_add_collab(user, rank, vault):
                           {'$push': {f'collaborators.{rank}': user}, "$pull": {'pending': user}})
 
 
+def delete_pending(user, vault):
+    with MongoClient(uri) as cluster:
+        vaults = cluster['IdeaVaults']['Vaults']
+        vaults.update_one({'title': vault}, {"$pull": {'pending': user}})
+
+
 if __name__ == "__main__":
     with MongoClient(uri) as cluster:
         vaults = cluster['IdeaVaults']['Vaults']

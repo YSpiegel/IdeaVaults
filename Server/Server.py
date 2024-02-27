@@ -199,6 +199,10 @@ def remove_pend_add_collab(data, client):
     DBHandle.remove_pend_add_collab(*data)
 
 
+def delete_pending(data, client):
+    DBHandle.delete_pending(*data)
+
+
 def act(action, data, client):
     actions = {"adduser": adduser,
                "sign-in": sign_in,
@@ -217,7 +221,8 @@ def act(action, data, client):
                "make-public": make_public,
                "produce-shared-key": produce_key,
                "check-key-and-pend-request": key_check_and_pend,
-               "pending-to-collaborator": remove_pend_add_collab}
+               "pending-to-collaborator": remove_pend_add_collab,
+               "delete-pending": delete_pending}
 
     actions[action](data, client)
 

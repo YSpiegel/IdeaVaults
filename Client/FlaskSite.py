@@ -337,6 +337,19 @@ def add_collaborator():
 
     return '', 200
 
+
+@app.route("/deny-collaborator", methods=["POST"])
+def deny_collaborator():
+    data = request.get_json()
+    user = data['user']
+    vault = data['vault']
+
+    client_socket = open_con("delete-pending", (user, vault))
+    client_socket.close()
+
+    return '', 200
+
+
 @app.route("/sign-out")
 def sign_out():
     client_socket = open_con("remove-mac", get_mac_address())
