@@ -195,6 +195,10 @@ def key_check_and_pend(data, client):
         client.send("409".encode())
 
 
+def remove_pend_add_collab(data, client):
+    DBHandle.remove_pend_add_collab(*data)
+
+
 def act(action, data, client):
     actions = {"adduser": adduser,
                "sign-in": sign_in,
@@ -212,7 +216,8 @@ def act(action, data, client):
                "gem-title-validation": gem_title_validation,
                "make-public": make_public,
                "produce-shared-key": produce_key,
-               "check-key-and-pend-request": key_check_and_pend}
+               "check-key-and-pend-request": key_check_and_pend,
+               "pending-to-collaborator": remove_pend_add_collab}
 
     actions[action](data, client)
 

@@ -170,6 +170,13 @@ def register_by_key(key, user):
             vaults.update_one({'key': key}, {'$set': {'pending': [user]}})
 
 
+def remove_pend_add_collab(user, rank, vault):
+    with MongoClient(uri) as cluster:
+        vaults = cluster['IdeaVaults']['Vaults']
+        vaults.update_one({'title': vault},
+                          {'$push': {f'collaborators.{rank}': user}, "$pull": {'pending': user}})
+
+
 if __name__ == "__main__":
     with MongoClient(uri) as cluster:
         vaults = cluster['IdeaVaults']['Vaults']

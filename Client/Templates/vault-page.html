@@ -27,8 +27,9 @@ function getIdTitle(title) {
     return title.replace(/ /g, '_');
 }
 </script>
+
 <div class="container justify-content-center">
-    <h2 style="text-align: center">{{vault.title}}</h2>
+    <h2 style="text-align: center" id="titleLabel">{{vault.title}}</h2>
     <nav class="navbar navbar-expand-lg navbar-light bg-light mt-3" id="vault-navbar">
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 justify-content-center">
@@ -500,6 +501,9 @@ const navItems = document.querySelectorAll('[data-group="mainnavbar"]');
   spreadItems();
 
   window.addEventListener('resize', spreadItems);
+
+
+
 </script>
 
 
@@ -512,10 +516,10 @@ const navItems = document.querySelectorAll('[data-group="mainnavbar"]');
     </div>
     <div class="offcanvas-body">
         <ul class="list-group list-group-flush">
-          <li class="list-group-item">
+          <li class="list-group-item" id="ownerLabel">
             Owner: {{vault.owner}}
           </li>
-          <li class="list-group-item">
+          <li class="list-group-item" id="co-owners-list">
               {% if vault.collaborators.coowner %}
               Co-owners:
                 <ul class="list-group list-group-flush">
@@ -527,7 +531,7 @@ const navItems = document.querySelectorAll('[data-group="mainnavbar"]');
               Co-owners: None
               {% endif %}
           </li>
-          <li class="list-group-item">
+          <li class="list-group-item" id="contributors-list">
               {% if vault.collaborators.contributor %}
               Contributors:
                 <ul class="list-group list-group-flush">
@@ -539,7 +543,7 @@ const navItems = document.querySelectorAll('[data-group="mainnavbar"]');
               Contributors: None
               {% endif %}
           </li>
-          <li class="list-group-item">
+          <li class="list-group-item" id="guests-list">
               {% if vault.collaborators.guest %}
               Guests:
                 <ul class="list-group list-group-flush">
@@ -552,26 +556,87 @@ const navItems = document.querySelectorAll('[data-group="mainnavbar"]');
               {% endif %}
           </li>
         </ul>
+
+        <script>
+        const coownersList = document.getElementById('co-owners-list');
+        const contributorsList = document.getElementById('contributors-list');
+        const guestsList = document.getElementById('guests-list');
+
+        function addCollaborator(user, rank) {
+            fetch('/add-collaborator', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    user: user, rank: rank, vault: '{{vault.title}}'
+                })
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    let list;
+                    if (rank === 'Guest') {
+                        list = guestsList;
+                    } else if (rank === 'Contributor') {
+                        list = contributorsList;
+                    } else if (rank === 'Co-owner') {
+                        list = coownersList;
+                    }
+
+                    // Check if no UL yet
+                    if (!list.querySelector('ul')) {
+                        // Replace none text
+                        list.innerText = `${rank}s:`;
+
+                        // Create UL
+                        const ul = document.createElement('ul');
+                        ul.classList.add('list-group', 'list-group-flush');
+
+                        // Append new user
+                        const li = document.createElement('li');
+                        li.classList.add('list-group-item');
+                        li.textContent = user;
+                        ul.appendChild(li);
+
+                        // Append UL
+                        list.appendChild(ul);
+                    } else {
+                        // Append user to existing UL
+                        const li = document.createElement('li');
+                        li.classList.add('list-group-item');
+                        li.textContent = user;
+                        list.querySelector('ul').appendChild(li);
+                    }
+                } else {
+                    console.error('Error:', response.statusText);
+                    // Handle error gracefully, inform the user, etc.
+                }
+            })
+            .catch(error => {
+                console.log('Error:', error);
+            });
+        };
+        </script>
         {% if vault.pending %}
         <br><br>
-        <h4>Pending:</h4>
+        <h4 id="pendingLabel">Pending:</h4>
         <ul class="list-group list-group-flush">
         {% for user in vault.pending %}
-            <li class="list-group-item">
+            <li class="list-group-item" id="user-item{{loop.index}}">
                 <nav class="navbar navbar-expand-lg navbar-light bg-light mt-3">
                   <div class="collapse navbar-collapse">
                     <ul class="navbar-nav mx-auto mb-2 mb-lg-0" style="font-size: 18px;">
                       <li class="nav-item p-3">
-                        <h5>{{user}}</h5>
+                        <h6>{{user}}</h6>
                       </li>
                       <li class="nav-item p-3">
                         <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
                             Accept
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item">Guest</a></li>
-                            <li><a class="dropdown-item">Contributor</a></li>
-                            <li><a class="dropdown-item">Co-owner</a></li>
+                            <li id="add-as-guest{{loop.index}}"><button class="dropdown-item">Guest</button></li>
+                            <li id="add-as-contributor{{loop.index}}"><button class="dropdown-item">Contributor</button></li>
+                            <li id="add-as-co-owner{{loop.index}}"><button class="dropdown-item">Co-owner</button></li>
                         </ul>
                       </li>
                       <li class="nav-item p-3">
@@ -581,6 +646,27 @@ const navItems = document.querySelectorAll('[data-group="mainnavbar"]');
                   </div>
                 </nav>
             </li>
+            <script>
+                const guestBtn = document.getElementById('add-as-guest{{loop.index}}');
+                const contributorBtn = document.getElementById('add-as-contributor{{loop.index}}');
+                const coownerBtn = document.getElementById('add-as-co-owner{{loop.index}}');
+                const userItem = document.getElementById('user-item{{loop.index}}');
+
+                guestBtn.addEventListener('click', () => {
+                addCollaborator('{{user}}', 'Guest');
+                userItem.remove();
+                });
+
+                contributorBtn.addEventListener('click', () => {
+                addCollaborator('{{user}}', 'Contributor');
+                userItem.remove();
+                });
+
+                coownerBtn.addEventListener('click', () => {
+                addCollaborator('{{user}}', 'Co-owner');
+                userItem.remove();
+                });
+            </script>
         {% endfor %}
         </ul>
         {% endif %}
@@ -667,6 +753,7 @@ openSharedKey.addEventListener('click', () => {
   }
 });
 </script>
+
 {% endif %}
 
 {% endblock %}

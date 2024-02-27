@@ -325,6 +325,18 @@ def send_key_request():
     return '', response
 
 
+@app.route("/add-collaborator", methods=['POST'])
+def add_collaborator():
+    data = request.get_json()
+    user = data['user']
+    rank = data['rank'].lower()
+    vault = data['vault']
+
+    client_socket = open_con("pending-to-collaborator", (user, rank, vault))
+    client_socket.close()
+
+    return '', 200
+
 @app.route("/sign-out")
 def sign_out():
     client_socket = open_con("remove-mac", get_mac_address())
