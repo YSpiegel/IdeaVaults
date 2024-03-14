@@ -3,7 +3,7 @@ import DBHandle
 import ObjManagement as obj
 import threading as th
 
-IP = "127.0.0.1"
+IP = "172.20.157.70"
 PORT = 7891
 
 

@@ -6,7 +6,7 @@ import socket, pickle, uuid, ast
 
 app = Flask(__name__)
 
-IP = "127.0.0.1"
+IP = "172.20.157.70"
 PORT = 7891
 
 

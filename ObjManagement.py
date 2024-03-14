@@ -50,12 +50,8 @@ class Vault:
     def is_in_vault(self, user):
         if not getattr(self, 'collaborators', None):
             return user == self.owner
-        return user == self.owner or user in self.collaborators.guest or \
-            user in self.collaborators.contributor or user in self.collaborators.coowner
-
-
-def vaultfromstr(str):
-    return Vault(*str.split("|||"))
+        return user == self.owner or user in self.collaborators['guest'] or \
+            user in self.collaborators['contributor'] or user in self.collaborators['coowner']
 
 
 class Gem:
