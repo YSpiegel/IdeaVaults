@@ -6,7 +6,7 @@ import socket, pickle, uuid, ast
 
 app = Flask(__name__)
 
-IP = "172.20.157.70"
+IP = "192.168.1.113"
 PORT = 7891
 
 
@@ -72,7 +72,7 @@ user = ""
 
 @app.route('/')
 def base():
-    return render_template("base.html")
+    return redirect(url_for('home'))
 
 
 @app.route('/home')

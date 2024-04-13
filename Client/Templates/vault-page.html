@@ -68,8 +68,6 @@ function getIdTitle(title) {
                         </nav></li>
                     </ul>
                 </li>
-                <li class="nav-item"><a class="nav-link active" aria-current="page" href="#" data-group="mainnavbar">
-                    Filter contents</a></li>
                 {% if vault.type == "private" %}
                 <li class="nav-item"><a class="nav-link active" aria-current="page" data-group="mainnavbar"
                                         href="/making-{{vault.title}}-public">Make Public</a></li>
@@ -93,11 +91,8 @@ function getIdTitle(title) {
     <div id="card{{gem.title}}" class="card m-2" style="flex: 0 0 calc(25% - 2rem); max-width: calc(25% - 2rem);">
         <div class="card-header">
             <nav class="navbar bg-body-tertiary" style="padding: 0">
-                <div class="btn-group" role="group" aria-label="Basic example">
-                  <button type="button" class="btn btn-primary">Copy</button>
-                  <button type="button" class="btn btn-primary">Edit</button>
-                  <button type="button" class="btn btn-primary">Tags</button>
-                </div>
+                <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                        data-bs-target="#deleteModal{{gem.idtitle}}">Open</button>
                 <button class="btn btn-danger btn-sm" data-bs-toggle="modal"
                         data-bs-target="#deleteModal{{gem.idtitle}}">Delete</button>
                 </nav>
