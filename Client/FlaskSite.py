@@ -314,10 +314,10 @@ def update_gem_content():
     data = request.get_json()
     user = get_user()
     vault_title = data['vaultTitle']
-    gem_id_title = data['gemIdTitle']
+    gem_title = data['gemTitle']
     updated_content = data['updatedContent']
 
-    client_socket = open_con("update-gem-content", (user, vault_title, gem_id_title, updated_content))
+    client_socket = open_con("update-gem-content", (user, vault_title, gem_title, updated_content))
     client_socket.close()
 
     return '', 200

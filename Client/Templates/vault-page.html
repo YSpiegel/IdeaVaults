@@ -27,7 +27,8 @@ function getIdTitle(title) {
     return title.replace(/ /g, '_');
 }
 
-function checkGemContent(gemTitle, textArea) {
+function checkGemContent(gemTitle) {
+    const textArea = document.getElementById(`content${getIdTitle(gemTitle)}`);
     fetch('/get-gem-content', {
         method: 'POST',
         headers: {
@@ -53,7 +54,7 @@ function checkGemContent(gemTitle, textArea) {
 }
 
 function saveGemContent(gemTitle) {
-    const textArea = document.getElementById(`content${gemIdTitle}`);
+    const textArea = document.getElementById(`content${getIdTitle(gemTitle)}`);
     const updatedContent = textArea.value;
 
     fetch('/update-gem-content', {
@@ -69,10 +70,7 @@ function saveGemContent(gemTitle) {
     })
     .then(response => {
         if (response.ok) {
-            // Content updated successfully
-            console.log('Gem content updated');
-        } else {
-            console.error('Error updating gem content');
+            checkGemContent(gemTitle);
         }
     })
     .catch(error => {
@@ -184,16 +182,19 @@ function saveGemContent(gemTitle) {
             </div>
             <div class="modal-body">
             <h6>Author: {{gem.user}}</h6>
+            {% if gem.lastedit and gem.lastedit != gem.user %}
+            <h6>Last edited by: {{gem.lastedit}}</h6>
+            {% endif %}
             {% if gem.user == user or user in vault.collaborators.coowner or user == vault.owner %}
-            <textarea class="form-control" name="content"
-                oninput="checkGemContent('{{gem.title}}', this)">{{gem.content}}</textarea>
+            <textarea class="form-control" id="content{{gem.idtitle}}"
+                oninput="checkGemContent('{{gem.title}}')">{{gem.content}}</textarea>
             {% else %}
             <textarea class="form-control" disabled name="content">{{gem.content}}</textarea>
             {% endif %}
             </div>
             <div class="modal-footer">
             {% if gem.user == user or user in vault.collaborators.coowner or user == vault.owner %}
-            <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="update{{gem.idtitle}}"
                     onclick="saveGemContent('{{gem.title}}')" disabled>Save Changes</button>
             {% endif %}
             </div>

@@ -177,6 +177,10 @@ def get_gem_content(data, client):
     client.send(DBHandle.gem_content(*data).encode())
 
 
+def update_gem_content(data, client):
+    DBHandle.update_gem_content(*data)
+
+
 def delete_gem_from_vault(data, client):
     DBHandle.delete_gem(*data)
 
@@ -227,7 +231,8 @@ def act(action, data, client):
                "check-key-and-pend-request": key_check_and_pend,
                "pending-to-collaborator": remove_pend_add_collab,
                "delete-pending": delete_pending,
-               "get-gem-content": get_gem_content}
+               "get-gem-content": get_gem_content,
+               "update-gem-content": update_gem_content}
 
     actions[action](data, client)
 

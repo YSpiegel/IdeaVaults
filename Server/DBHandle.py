@@ -156,6 +156,12 @@ def gem_content(gem, vault):
         return gems.find_one({'title': gem, 'vault':vault})['content']
 
 
+def update_gem_content(user, vault, title, content):
+    with MongoClient(uri) as cluster:
+        gems = cluster['IdeaVaults']['Gems']
+        gems.update_one({'title': title, 'vault': vault}, {'$set': {'content': content, 'lastedit': user}})
+
+
 def make_public(vault):
     with MongoClient(uri) as cluster:
         vaults = cluster['IdeaVaults']['Vaults']
