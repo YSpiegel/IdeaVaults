@@ -112,10 +112,22 @@ def get_vault(user, title):
         return vaults.find_one({'owner':user, 'title':title})
 
 
+def all_collaborators(vault):
+    '''
+    Sums all collaborators of a certain vault in a list
+    :param vault: vault obj
+    :return: list of collaborators
+    '''
+    return vault.collaborators['coowner'] + vault.collaborators['contributor'] + vault.collaborators['guest']
+
+
 def get_gems(vault):
     with MongoClient(uri) as cluster:
         gems = cluster['IdeaVaults']['Gems']
-        return list(gems.find({'vault': vault.title, 'user': vault.owner}))
+        gems_list = list(gems.find({'vault': vault.title, 'user': vault.owner}))
+        for collab in all_collaborators(vault):
+            gems_list += list(gems.find({'vault': vault.title, 'user': collab}))
+        return gems_list
 
 
 def check_if_existing_gem(user, vault, title):
@@ -136,6 +148,12 @@ def delete_gem(gem, vault):
     with MongoClient(uri) as cluster:
         gems = cluster['IdeaVaults']['Gems']
         gems.delete_one({'title': gem, 'vault':vault})
+
+
+def gem_content(gem, vault):
+    with MongoClient(uri) as cluster:
+        gems = cluster['IdeaVaults']['Gems']
+        return gems.find_one({'title': gem, 'vault':vault})['content']
 
 
 def make_public(vault):

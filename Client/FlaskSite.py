@@ -295,6 +295,34 @@ def delete_gem():
     return '', 200
 
 
+@app.route('/get-gem-content', methods=['POST'])
+def get_gem_content():
+    data = request.get_json()
+    user = get_user()
+    vault_title = data['vaultTitle']
+    gem_title = data['gemTitle']
+
+    client_socket = open_con("get-gem-content", (gem_title, vault_title))
+    content = client_socket.recv(1024).decode()
+    client_socket.close()
+
+    return content
+
+
+@app.route('/update-gem-content', methods=['POST'])
+def update_gem_content():
+    data = request.get_json()
+    user = get_user()
+    vault_title = data['vaultTitle']
+    gem_id_title = data['gemIdTitle']
+    updated_content = data['updatedContent']
+
+    client_socket = open_con("update-gem-content", (user, vault_title, gem_id_title, updated_content))
+    client_socket.close()
+
+    return '', 200
+
+
 @app.route('/making-<vault>-public')
 def make_public(vault):
     client = open_con("make-public", vault)
