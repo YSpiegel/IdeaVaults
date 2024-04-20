@@ -320,7 +320,7 @@ def update_gem_content():
     client_socket = open_con("update-gem-content", (user, vault_title, gem_title, updated_content))
     client_socket.close()
 
-    return '', 200
+    return obj.string_preview(updated_content, 14, 21)
 
 
 @app.route('/making-<vault>-public')

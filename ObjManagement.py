@@ -55,13 +55,14 @@ class Vault:
 
 
 class Gem:
-    def __init__(self, vault, user, title, content):
+    def __init__(self, vault, user, title, content, lastedit=None):
         self.vault = vault
         self.user = user
         self.title = title
         self.content = content
         self.idtitle = self.title.replace(' ', '_')
-
+        if lastedit:
+            self.lastedit = lastedit
         self.preview = string_preview(self.content, 14, 21)
 
     def __str__(self):

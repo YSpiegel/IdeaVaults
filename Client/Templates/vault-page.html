@@ -53,8 +53,9 @@ function checkGemContent(gemTitle) {
     });
 }
 
-function saveGemContent(gemTitle) {
-    const textArea = document.getElementById(`content${getIdTitle(gemTitle)}`);
+function saveGemContent(gemTitle, gemUser) {
+    const gemIdTitle = getIdTitle(gemTitle);
+    const textArea = document.getElementById(`content${gemIdTitle}`);
     const updatedContent = textArea.value;
 
     fetch('/update-gem-content', {
@@ -68,9 +69,17 @@ function saveGemContent(gemTitle) {
             updatedContent: updatedContent
         })
     })
-    .then(response => {
-        if (response.ok) {
-            checkGemContent(gemTitle);
+    .then(response => response.text())
+    .then(data => {
+        checkGemContent(gemTitle);
+        document.getElementById(`preview${gemIdTitle}`).innerHTML = data;
+
+        const lasteditlabel = getElementById('lastedit${gemIdTitle}}');
+        if (user != gemUser) {
+            lasteditlabel.innerHTML = "Last edited by: ${{user}}";
+        }
+        else {
+            lasteditlabel.innerHTML = "";
         }
     })
     .catch(error => {
@@ -150,7 +159,7 @@ function saveGemContent(gemTitle) {
         </div>
             <div class="card-body">
             <h5 class="card-title">{{gem.title}}</h5>
-            <p class="card-text">{{gem.preview}}</p>
+            <p class="card-text" id="preview{{gem.idtitle}}">{{gem.preview}}</p>
             </div>
     </div>
     <div class="modal fade" id="deleteModal{{gem.idtitle}}" tabindex="-1"
@@ -182,9 +191,7 @@ function saveGemContent(gemTitle) {
             </div>
             <div class="modal-body">
             <h6>Author: {{gem.user}}</h6>
-            {% if gem.lastedit and gem.lastedit != gem.user %}
-            <h6>Last edited by: {{gem.lastedit}}</h6>
-            {% endif %}
+            <h6 id="lastedit{{gem.idtitle}}"></h6>
             {% if gem.user == user or user in vault.collaborators.coowner or user == vault.owner %}
             <textarea class="form-control" id="content{{gem.idtitle}}"
                 oninput="checkGemContent('{{gem.title}}')">{{gem.content}}</textarea>
@@ -195,7 +202,7 @@ function saveGemContent(gemTitle) {
             <div class="modal-footer">
             {% if gem.user == user or user in vault.collaborators.coowner or user == vault.owner %}
             <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="update{{gem.idtitle}}"
-                    onclick="saveGemContent('{{gem.title}}')" disabled>Save Changes</button>
+                    onclick="saveGemContent('{{gem.title}}', '{{gem.user}}')" disabled>Save Changes</button>
             {% endif %}
             </div>
             </div>
@@ -577,7 +584,15 @@ const navItems = document.querySelectorAll('[data-group="mainnavbar"]');
 
   window.addEventListener('resize', spreadItems);
 
+function setLastEdits() {
+    for (var i = 0; i < gems.length; i++) {
+        if (gems[i].lastedit && gems[i].lastedit !== gems[i].user) {
+            document.getElementById(`lastedit${gems[i].idtitle}`).innerHTML = `Last edited by: ${gems[i].lastedit}`;
+        }
+    }
+}
 
+setLastEdits();
 
 </script>
 

@@ -150,7 +150,10 @@ def get_desc(data, client):
 def gems_by_vault(vault, client):
     gems = DBHandle.get_gems(vault)
     for gem in gems:
-        gem_obj = obj.Gem(gem['vault'], gem['user'], gem['title'], gem['content'])
+        if 'lastedit' in gem:
+            gem_obj = obj.Gem(gem['vault'], gem['user'], gem['title'], gem['content'], gem['lastedit'])
+        else:
+            gem_obj = obj.Gem(gem['vault'], gem['user'], gem['title'], gem['content'])
         client.send(pickle.dumps(gem_obj))
         confirm = client.recv(1024).decode()
         if confirm != "next":
