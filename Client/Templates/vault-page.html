@@ -655,14 +655,15 @@ const navItems = document.querySelectorAll('[data-group="mainnavbar"]');
                         list = guestsList;
                     } else if (rank === 'Contributor') {
                         list = contributorsList;
-                    } else if (rank === 'Co-owner') {
+                    } else if (rank === 'Coowner') {
                         list = coownersList;
                     }
 
                     // Check if no UL yet
                     if (!list.querySelector('ul')) {
                         // Replace none text
-                        list.innerText = `${rank}s:`;
+                        if (rank === 'Coowner') { list.innerText = 'Co-owners:';}
+                        else { list.innerText = `${rank}s:`};
 
                         // Create UL
                         const ul = document.createElement('ul');
@@ -758,7 +759,7 @@ const navItems = document.querySelectorAll('[data-group="mainnavbar"]');
                 });
 
                 coownerBtn.addEventListener('click', () => {
-                addCollaborator('{{user}}', 'Co-owner');
+                addCollaborator('{{user}}', 'Coowner');
                 userItem.remove();
                 });
 
