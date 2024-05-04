@@ -36,6 +36,17 @@ def string_preview(text, max_width_rems, font_height_pixels):
     return preview
 
 
+class UserInfo:
+    def __init__(self, name):
+        self.name = name
+
+    def private_vaults(self):
+        return []
+
+    def shared_vaults(self):
+        return []
+
+
 class Vault:
     def __init__(self, title, owner, description, type, collaborators=None, pending=None):
         self.title = title
@@ -68,6 +79,3 @@ class Gem:
     def __str__(self):
         return f"{self.vault}|||{self.user}|||{self.title}|||{self.content}"
 
-
-def gemfromstr(str):
-    return Gem(*str.split("|||"))

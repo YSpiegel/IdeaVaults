@@ -36,19 +36,6 @@ def get_vault(title):
     return pickle.loads(vault) if vault != b'@' else ""
 
 
-def get_vault_gems(vault):
-    client_socket = open_con("get-gems-by-vault", vault)
-    gem = client_socket.recv(1024)
-    gems = []
-    while gem != b"@":
-        gem = pickle.loads(gem)
-        gems.append(gem)
-        client_socket.send("next".encode())
-        gem = client_socket.recv(1024)
-    client_socket.close()
-    return gems
-
-
 def get_vaults(user, type):
     client_socket = open_con(f"get-vaults-by-type", (user, type))
     vault = client_socket.recv(1024)
@@ -60,6 +47,38 @@ def get_vaults(user, type):
         vault = client_socket.recv(1024)
     client_socket.close()
     return vaults
+
+
+def private_vaults(self):
+    return get_vaults(self.name, "private")
+
+
+def shared_vaults(self):
+    return get_vaults(self.name, "shared")
+
+
+obj.UserInfo.private_vaults = private_vaults
+obj.UserInfo.shared_vaults = shared_vaults
+
+
+def get_userinfo():
+    client_socket = open_con("get-user-by-addr", get_mac_address())
+    user = client_socket.recv(1024).decode()
+    client_socket.close()
+    return obj.UserInfo(user) if user != '@' else ""
+
+
+def get_vault_gems(vault):
+    client_socket = open_con("get-gems-by-vault", vault)
+    gem = client_socket.recv(1024)
+    gems = []
+    while gem != b"@":
+        gem = pickle.loads(gem)
+        gems.append(gem)
+        client_socket.send("next".encode())
+        gem = client_socket.recv(1024)
+    client_socket.close()
+    return gems
 
 
 @app.route('/static/<path:filepath>')
@@ -160,8 +179,10 @@ def dashboard():
 
 @app.route('/<type>-vaults')
 def vaults_hub(type):
-    user = get_user()
-    return render_template('vaults-hub.html', type=type, user=user, vaults=get_vaults(user, type))
+    user = get_userinfo()
+    if type == "shared":
+        return render_template('vaults-hub.html', type=type, user=user.name, vaults=user.shared_vaults())
+    return render_template('vaults-hub.html', type=type, user=user.name, vaults=user.private_vaults())
 
 
 @app.route('/new-vault/<type>')
