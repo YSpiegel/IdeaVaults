@@ -1,4 +1,4 @@
-import ctypes
+import ctypes, string, random, datetime, hashlib, re, base64, pickle
 
 
 # Windows API text measurement
@@ -79,3 +79,80 @@ class Gem:
     def __str__(self):
         return f"{self.vault}|||{self.user}|||{self.title}|||{self.content}"
 
+
+class Utils:
+    def __init__(self):
+        self.keylength = 7
+        self.endingequals = r'(=+)$'
+        self.baserot = 2
+
+    def get_greeting(self):
+        current_hour = datetime.datetime.now().hour
+        if current_hour < 12:
+            greeting = "Good morning"
+        elif 12 <= current_hour < 18:
+            greeting = "Good afternoon"
+        else:
+            greeting = "Good evening"
+        return greeting
+
+    def create_key(self):
+        key = ""
+        chars = string.digits + string.ascii_uppercase
+
+        for _ in range(self.keylength):
+            key += chars[random.randint(0, len(chars) - 1)]
+
+        return key
+
+    def md5hash(self, plain):
+        return hashlib.md5(plain.encode('utf-8')).hexdigest()
+
+    def rotate(self, text, key):
+        length = len(text)
+        key = key % length
+        rotated_text = text[key:] + text[:key]
+        return rotated_text
+
+    def rblhash(self, plain):
+        return self.rotate(self.md5hash(plain), len(plain))
+
+    def compare_rbl(self, plain, hashed):
+        return self.rblhash(plain) == hashed
+
+    def flipbase(self, msg, action):
+        if action == 'encrypt':
+            if isinstance(msg, str):
+                msg = msg.encode('utf-8')
+            encoded_bytes = base64.b64encode(msg)
+            msg = encoded_bytes.decode('utf-8')
+
+        match = re.search(self.endingequals, msg)
+        if match:
+            endingequals = match.group(1)
+            msg = msg[:-len(endingequals)]
+        else:
+            endingequals = ""
+
+        switched_text = ""
+        for i in range(0, len(msg), 2 * self.baserot):
+            if i + 2 * self.baserot <= len(msg):
+                switched_text += msg[i + self.baserot:i + 2 * self.baserot] + msg[i:i + self.baserot]
+            else:
+                switched_text += msg[i:][::-1]
+        switched_text += endingequals
+
+        if action == 'decrypt':
+            decoded_bytes = base64.b64decode(switched_text)
+            if decoded_bytes.startswith(b'\x80'):
+                return pickle.loads(decoded_bytes)
+            switched_text = decoded_bytes.decode('utf-8')
+
+        return switched_text
+
+
+if __name__ == "__main__":
+    util = Utils()
+    encrypted = util.flipbase(pickle.dumps((8, 9)), 'encrypt')
+    print(encrypted)
+    print(util.flipbase(encrypted, 'decrypt'))

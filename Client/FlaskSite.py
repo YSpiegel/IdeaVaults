@@ -1,6 +1,4 @@
 import ObjManagement as obj
-import utils, crypt
-
 from flask import Flask, render_template, request, url_for, redirect, send_from_directory, jsonify
 import socket, pickle, uuid, ast
 
@@ -8,18 +6,19 @@ app = Flask(__name__)
 
 IP = "192.168.1.113"
 PORT = 7891
+util = obj.Utils()
 
 
 def open_con(action, data):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((IP, PORT))
-    client_socket.send(pickle.dumps((action, data)))
+    client_socket.send(util.flipbase(pickle.dumps((action, data)), 'encrypt'))
     return client_socket
 
 
 def get_mac_address():
     mac = uuid.getnode()
-    return crypt.rblhash(':'.join(("%012X" % mac)[i:i+2] for i in range(0, 12, 2)))
+    return util.rblhash(':'.join(("%012X" % mac)[i:i+2] for i in range(0, 12, 2)))
 
 
 def get_user():
@@ -110,7 +109,7 @@ def connect():
 
     if request.method == 'POST':
         identifier = request.form['identifier']
-        password = crypt.rblhash(request.form['password'])
+        password = util.rblhash(request.form['password'])
 
         client_socket = open_con("sign-in", (identifier, password))
         name = client_socket.recv(1024).decode()
@@ -143,7 +142,7 @@ def signup():
         errortext = ""
 
         if password == confirm_password:
-            client_socket = open_con("adduser", (name, email, crypt.rblhash(password)))
+            client_socket = open_con("adduser", (name, email, util.rblhash(password)))
             new_name, new_email, valid_name = pickle.loads(client_socket.recv(1024))
             client_socket.close()
 
@@ -173,7 +172,7 @@ def signup():
 def dashboard():
     user = get_user()
     if user:
-        return render_template('dashboard.html', user=user, greeting=utils.get_greeting())
+        return render_template('dashboard.html', user=user, greeting=util.get_greeting())
     return redirect(url_for('home'))
 
 
@@ -355,7 +354,7 @@ def make_public(vault):
 def produce_key():
     data = request.get_json()
     vault_title = data['vaultTitle']
-    key = utils.create_key(7)
+    key = util.create_key()
     client = open_con("produce-shared-key", (vault_title, key))
     client.close()
     return key

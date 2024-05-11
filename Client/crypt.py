@@ -7,7 +7,7 @@ def md5hash(plain):
 
 def rotate(text, key):
     length = len(text)
-    key = key % length  # Adjust key in case it's larger than the length of the string
+    key = key % length
     rotated_text = text[key:] + text[:key]
     return rotated_text
 
