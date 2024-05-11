@@ -12,7 +12,7 @@ util = obj.Utils()
 def open_con(action, data):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((IP, PORT))
-    client_socket.send(util.flipbase(pickle.dumps((action, data)), 'encrypt'))
+    client_socket.send(util.flipbase(pickle.dumps((action, data)), 'e'))
     return client_socket
 
 
@@ -23,27 +23,26 @@ def get_mac_address():
 
 def get_user():
     client_socket = open_con("get-user-by-addr", get_mac_address())
-    user = client_socket.recv(1024).decode()
+    user = util.flipbase(client_socket.recv(1024), 'd')
     client_socket.close()
     return user if user != '@' else ""
 
 
 def get_vault(title):
     client_socket = open_con("get-vault-by-title", title)
-    vault = client_socket.recv(1024)
+    vault = util.flipbase(client_socket.recv(1024), 'd')
     client_socket.close()
-    return pickle.loads(vault) if vault != b'@' else ""
+    return vault if vault != b'@' else ""
 
 
 def get_vaults(user, type):
     client_socket = open_con(f"get-vaults-by-type", (user, type))
-    vault = client_socket.recv(1024)
+    vault = util.flipbase(client_socket.recv(1024), 'd')
     vaults = []
-    while vault != b"@":
-        vault = pickle.loads(vault)
+    while vault != "@":
         vaults.append(vault)
         client_socket.send("next".encode())
-        vault = client_socket.recv(1024)
+        vault = util.flipbase(client_socket.recv(1024), 'd')
     client_socket.close()
     return vaults
 
@@ -62,20 +61,19 @@ obj.UserInfo.shared_vaults = shared_vaults
 
 def get_userinfo():
     client_socket = open_con("get-user-by-addr", get_mac_address())
-    user = client_socket.recv(1024).decode()
+    user = util.flipbase(client_socket.recv(1024), 'd')
     client_socket.close()
     return obj.UserInfo(user) if user != '@' else ""
 
 
 def get_vault_gems(vault):
     client_socket = open_con("get-gems-by-vault", vault)
-    gem = client_socket.recv(1024)
+    gem = util.flipbase(client_socket.recv(1024), 'd')
     gems = []
     while gem != b"@":
-        gem = pickle.loads(gem)
         gems.append(gem)
         client_socket.send("next".encode())
-        gem = client_socket.recv(1024)
+        gem = util.flipbase(client_socket.recv(1024), 'd')
     client_socket.close()
     return gems
 
@@ -112,12 +110,12 @@ def connect():
         password = util.rblhash(request.form['password'])
 
         client_socket = open_con("sign-in", (identifier, password))
-        name = client_socket.recv(1024).decode()
+        name = util.flipbase(client_socket.recv(1024), 'd')
         client_socket.close()
 
         if name != '@':
             client_socket = open_con("register-user", (name, get_mac_address()))
-            already_connected = client_socket.recv(1024).decode()
+            already_connected = util.flipbase(client_socket.recv(1024), 'd')
             client_socket.close()
             if already_connected == "False":
                 return redirect(url_for('dashboard'))
@@ -143,12 +141,13 @@ def signup():
 
         if password == confirm_password:
             client_socket = open_con("adduser", (name, email, util.rblhash(password)))
-            new_name, new_email, valid_name = pickle.loads(client_socket.recv(1024))
+            new_name, new_email, valid_name = util.flipbase(client_socket.recv(1024), 'd')
             client_socket.close()
 
             if new_name and new_email:
                 if valid_name:
                     client_socket = open_con("register-user", (name, get_mac_address()))
+                    client_socket.recv(1024)
                     client_socket.close()
                     return redirect(url_for('dashboard'))
                 else:
@@ -213,7 +212,7 @@ def new_vault():
         vault = obj.Vault(title, user, description, type)
 
         client_socket = open_con("add-vault", vault)
-        feedback = client_socket.recv(1024).decode()
+        feedback = util.flipbase(client_socket.recv(1024), 'd')
         client_socket.close()
 
         if feedback == "ChangeTitle":
@@ -269,7 +268,7 @@ def check_description():
     title = data['vaultTitle']
 
     client_socket = open_con("find-desc", (user, title))
-    desc = client_socket.recv(1024).decode()
+    desc = util.flipbase(client_socket.recv(1024), 'd')
     client_socket.close()
 
     return desc
@@ -297,7 +296,7 @@ def gem_title_validation():
     title = data['gemTitle']
 
     client_socket = open_con("gem-title-validation", (user, vault, title))
-    response = int(client_socket.recv(1024).decode())
+    response = int(util.flipbase(client_socket.recv(1024), 'd'))
     client_socket.close()
 
     return '', response
@@ -323,7 +322,7 @@ def get_gem_content():
     gem_title = data['gemTitle']
 
     client_socket = open_con("get-gem-content", (gem_title, vault_title))
-    content = client_socket.recv(1024).decode()
+    content = util.flipbase(client_socket.recv(1024), 'd')
     client_socket.close()
 
     return content
@@ -367,7 +366,7 @@ def send_key_request():
     user = data['user']
 
     client_socket = open_con("check-key-and-pend-request", (key, user))
-    response = int(client_socket.recv(1024).decode())
+    response = int(util.flipbase(client_socket.recv(1024), 'd'))
     client_socket.close()
 
     return '', response

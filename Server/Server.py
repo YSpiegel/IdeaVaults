@@ -5,6 +5,7 @@ import threading as th
 
 IP = "192.168.1.113"
 PORT = 7891
+util = obj.Utils()
 
 
 def adduser(data, client):
@@ -20,7 +21,7 @@ def adduser(data, client):
     new_email = DBHandle.check_if_new(email)
     valid_name = re.match(r'^[a-zA-Z0-9_ ]{4,20}$', name) != None
 
-    client.send(pickle.dumps((new_name, new_email, valid_name)))
+    client.send(util.flipbase(pickle.dumps((new_name, new_email, valid_name)), 'e'))
     if new_name and new_email and valid_name:
         DBHandle.add_new(name, email, password)
 
@@ -36,7 +37,7 @@ def sign_in(data, client):
     """
     identifier, password = data
     name = DBHandle.sign_in(identifier, password)
-    client.send(name.encode())
+    client.send(util.flipbase(name, 'e'))
 
 
 def register_user(data, client):
@@ -50,7 +51,7 @@ def register_user(data, client):
     already_connected = DBHandle.check_if_connected(name)
     if not already_connected:
         DBHandle.add_mac(name, mac)
-    client.send(str(already_connected).encode())
+    client.send(util.flipbase(str(already_connected), 'e'))
 
 
 def search_addr(user_mac, client):
@@ -62,8 +63,9 @@ def search_addr(user_mac, client):
     """
     user = DBHandle.find_by_addr(user_mac)
     if user:
-        client.send(user['name'].encode())
+        client.send(util.flipbase(user['name'], 'e'))
     else:
+        client.send("@".encode())
         client.send("@".encode())
 
 
@@ -85,7 +87,7 @@ def search_vault(vault_title, client):
                                       vault['collaborators'])
         else:
             vault_obj = obj.Vault(vault['title'], vault['owner'], vault['description'], vault['type'])
-        client.send(pickle.dumps(vault_obj))
+        client.send(util.flipbase(pickle.dumps(vault_obj), 'e'))
     else:
         client.send("@".encode())
 
@@ -117,11 +119,12 @@ def get_vaults_by_type(data, client):
                               vault['collaborators'])
         else:
             vault_obj = obj.Vault(vault['title'], vault['owner'], vault['description'], vault['type'])
-        client.send(pickle.dumps(vault_obj))
+
+        client.send(util.flipbase(pickle.dumps(vault_obj), 'e'))
         confirm = client.recv(1024).decode()
         if confirm != "next":
             return
-    client.send(b'@')
+    client.send(util.flipbase('@', 'e'))
 
 
 def add_vault(vault, client):
@@ -132,10 +135,10 @@ def add_vault(vault, client):
     :return:
     """
     if not DBHandle.check_if_new_vault(vault):
-        client.send("ChangeTitle".encode())
+        client.send(util.flipbase("ChangeTitle", 'e'))
 
     DBHandle.add_vault(vault)
-    client.send("OK".encode())
+    client.send(util.flipbase("OK", 'e'))
 
 
 def update_description(data, client):
@@ -144,7 +147,7 @@ def update_description(data, client):
 
 def get_desc(data, client):
     vault = DBHandle.get_vault(*data)
-    client.send(vault['description'].encode())
+    client.send(util.flipbase(vault['description'], 'e'))
 
 
 def gems_by_vault(vault, client):
@@ -154,7 +157,7 @@ def gems_by_vault(vault, client):
             gem_obj = obj.Gem(gem['vault'], gem['user'], gem['title'], gem['content'], gem['lastedit'])
         else:
             gem_obj = obj.Gem(gem['vault'], gem['user'], gem['title'], gem['content'])
-        client.send(pickle.dumps(gem_obj))
+        client.send(util.flipbase(pickle.dumps(gem_obj), 'e'))
         confirm = client.recv(1024).decode()
         if confirm != "next":
             return
@@ -163,21 +166,20 @@ def gems_by_vault(vault, client):
 
 def add_gem_to_vault(data, client):
     DBHandle.add_new_gem(*data)
-    #client.send(pickle.dumps(new_gem))
 
 
 def gem_title_validation(data, client):
     if DBHandle.check_if_existing_gem(*data):
-        client.send("409".encode())
+        client.send(util.flipbase('409', 'e'))
         return
     if re.match(r'^[A-Za-z0-9\-:. ]*$', data[-1]) == None:
-        client.send("1001".encode())
+        client.send(util.flipbase('1001', 'e'))
         return
-    client.send("200".encode())
+    client.send(util.flipbase('200', 'e'))
 
 
 def get_gem_content(data, client):
-    client.send(DBHandle.gem_content(*data).encode())
+    client.send(util.flipbase(DBHandle.gem_content(*data), 'e'))
 
 
 def update_gem_content(data, client):
@@ -201,9 +203,9 @@ def key_check_and_pend(data, client):
     key, user = data
     if DBHandle.check_if_key_exists(key):
         DBHandle.register_by_key(key, user)
-        client.send("200".encode())
+        client.send(util.flipbase('200', 'e'))
     else:
-        client.send("409".encode())
+        client.send(util.flipbase('409', 'e'))
 
 
 def remove_pend_add_collab(data, client):
@@ -247,7 +249,7 @@ def main():
 
     while True:
         client, ip = server_socket.accept()
-        action, data = pickle.loads(client.recv(1024))
+        action, data = util.flipbase(client.recv(1024), 'd')
         thread = th.Thread(target=act, args=(action, data, client))
         thread.start()
 

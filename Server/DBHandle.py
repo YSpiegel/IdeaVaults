@@ -125,8 +125,9 @@ def get_gems(vault):
     with MongoClient(uri) as cluster:
         gems = cluster['IdeaVaults']['Gems']
         gems_list = list(gems.find({'vault': vault.title, 'user': vault.owner}))
-        for collab in all_collaborators(vault):
-            gems_list += list(gems.find({'vault': vault.title, 'user': collab}))
+        if hasattr(vault, 'collaborators'):
+            for collab in all_collaborators(vault):
+                gems_list += list(gems.find({'vault': vault.title, 'user': collab}))
         return gems_list
 
 

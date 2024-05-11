@@ -121,11 +121,12 @@ class Utils:
         return self.rblhash(plain) == hashed
 
     def flipbase(self, msg, action):
-        if action == 'encrypt':
+        if action == 'e':
             if isinstance(msg, str):
                 msg = msg.encode('utf-8')
-            encoded_bytes = base64.b64encode(msg)
-            msg = encoded_bytes.decode('utf-8')
+            msg = base64.b64encode(msg)
+
+        msg = msg.decode('utf-8')
 
         match = re.search(self.endingequals, msg)
         if match:
@@ -142,11 +143,13 @@ class Utils:
                 switched_text += msg[i:][::-1]
         switched_text += endingequals
 
-        if action == 'decrypt':
+        if action == 'd':
             decoded_bytes = base64.b64decode(switched_text)
             if decoded_bytes.startswith(b'\x80'):
                 return pickle.loads(decoded_bytes)
             switched_text = decoded_bytes.decode('utf-8')
+        else:
+            return switched_text.encode()
 
         return switched_text
 
