@@ -73,12 +73,11 @@ function saveGemContent(gemTitle, gemUser) {
     .then(data => {
         checkGemContent(gemTitle);
         document.getElementById(`preview${gemIdTitle}`).innerHTML = data;
+    })
     .catch(error => {
         console.log('Error:', error);
     });
 }
-
-
 </script>
 
 <div class="container justify-content-center">
@@ -139,39 +138,8 @@ function saveGemContent(gemTitle, gemUser) {
             </ul>
         </div>
     </nav>
-    <div id='gemcards' class="container-flex d-flex flex-wrap justify-content-center">
+    <div class="container-flex d-flex flex-wrap justify-content-center">
     {% for gem in gems %}
-    <div class="modal fade" id="openModal{{gem.idtitle}}" tabindex="-1"
-         aria-labelledby="deleteModalLabel" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-            <div class="modal-header">
-            <h5 class="modal-title" id="openModalLabel1">{{gem.title}}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-            {% if vault.type == 'shared' %}
-            <h6>Author: {{gem.user}}</h6>
-            {% if gem.lastedit %}
-            <h6>Updated by {{gem.lastedit}}</h6>
-            {% endif %}
-            {% endif %}
-            {% if gem.user == user or user in vault.collaborators.coowner or user == vault.owner %}
-            <textarea class="form-control" id="content{{gem.idtitle}}"
-                oninput="checkGemContent('{{gem.title}}')">{{gem.content}}</textarea>
-            {% else %}
-            <textarea class="form-control" disabled name="content">{{gem.content}}</textarea>
-            {% endif %}
-            </div>
-            <div class="modal-footer">
-            {% if gem.user == user or user in vault.collaborators.coowner or user == vault.owner %}
-            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="update{{gem.idtitle}}"
-                    onclick="saveGemContent('{{gem.title}}', '{{gem.user}}')" disabled>Save Changes</button>
-            {% endif %}
-            </div>
-            </div>
-      </div>
-    </div>
     <div id="card{{gem.title}}" class="card m-2" style="flex: 0 0 calc(25% - 2rem); max-width: calc(25% - 2rem);">
         <div class="card-header">
             <nav class="navbar bg-body-tertiary" style="padding: 0">
@@ -201,6 +169,32 @@ function saveGemContent(gemTitle, gemUser) {
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
             <button type="button" class="btn btn-danger" data-category="confirmDelete"
                     onclick="confirmDeleteGem('{{gem.title}}')" data-bs-dismiss="modal">Delete</button>
+            </div>
+            </div>
+      </div>
+    </div>
+    <div class="modal fade" id="openModal{{gem.idtitle}}" tabindex="-1"
+         aria-labelledby="deleteModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="openModalLabel1">{{gem.title}}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            <h6>Author: {{gem.user}}</h6>
+            {% if gem.user == user or user in vault.collaborators.coowner or user == vault.owner %}
+            <textarea class="form-control" id="content{{gem.idtitle}}"
+                oninput="checkGemContent('{{gem.title}}')">{{gem.content}}</textarea>
+            {% else %}
+            <textarea class="form-control" disabled name="content">{{gem.content}}</textarea>
+            {% endif %}
+            </div>
+            <div class="modal-footer">
+            {% if gem.user == user or user in vault.collaborators.coowner or user == vault.owner %}
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="update{{gem.idtitle}}"
+                    onclick="saveGemContent('{{gem.title}}', '{{gem.user}}')" disabled>Save Changes</button>
+            {% endif %}
             </div>
             </div>
       </div>
@@ -302,7 +296,6 @@ gemTitle.addEventListener('input', checkInputs);
 gemContent.addEventListener('input', checkInputs);
 
 
-
 addButton.addEventListener('click', () => {
   const newGemTitle = document.getElementById('new-gem-title').value;
   const newGemContent = document.getElementById('new-gem-content').value;
@@ -321,7 +314,7 @@ addButton.addEventListener('click', () => {
   .then(response => {
     if (response.ok) {
       // Create and append the new gem card
-      const containerFlex = document.getElementById('gemcards');
+      const containerFlex = document.querySelector('.container-flex');
 
       // Create card
       const card = document.createElement('div');
@@ -770,7 +763,7 @@ const navItems = document.querySelectorAll('[data-group="mainnavbar"]');
                 })
             })
             .then(response => {
-                
+
             })
             .catch(error => {
                 console.log('Error:', error);

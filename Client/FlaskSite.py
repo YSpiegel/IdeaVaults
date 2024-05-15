@@ -284,7 +284,6 @@ def add_new_gem():
 
     client_socket = open_con("add-gem-to-vault", (user, vault_title, new_gem_title, new_gem_content))
     client_socket.close()
-    print('returning 200')
     return '', 200
 
 
