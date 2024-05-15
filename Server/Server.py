@@ -161,7 +161,7 @@ def gems_by_vault(vault, client):
         confirm = client.recv(1024).decode()
         if confirm != "next":
             return
-    client.send(b'@')
+    client.send(util.flipbase('@', 'e'))
 
 
 def add_gem_to_vault(data, client):

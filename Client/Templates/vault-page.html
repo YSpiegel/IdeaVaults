@@ -139,7 +139,7 @@ function saveGemContent(gemTitle, gemUser) {
             </ul>
         </div>
     </nav>
-    <div class="container-flex d-flex flex-wrap justify-content-center">
+    <div id='gemcards' class="container-flex d-flex flex-wrap justify-content-center">
     {% for gem in gems %}
     <div class="modal fade" id="openModal{{gem.idtitle}}" tabindex="-1"
          aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -150,9 +150,11 @@ function saveGemContent(gemTitle, gemUser) {
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+            {% if vault.type == 'shared' %}
             <h6>Author: {{gem.user}}</h6>
-            {% if not gem.lastedit or gem.user == gem.lastedit %}
+            {% if gem.lastedit %}
             <h6>Updated by {{gem.lastedit}}</h6>
+            {% endif %}
             {% endif %}
             {% if gem.user == user or user in vault.collaborators.coowner or user == vault.owner %}
             <textarea class="form-control" id="content{{gem.idtitle}}"
@@ -300,30 +302,33 @@ gemTitle.addEventListener('input', checkInputs);
 gemContent.addEventListener('input', checkInputs);
 
 
+
 addButton.addEventListener('click', () => {
+  const newGemTitle = document.getElementById('new-gem-title').value;
+  const newGemContent = document.getElementById('new-gem-content').value;
 
-    const newGemTitle = document.getElementById('new-gem-title').value;
-    const newGemContent = document.getElementById('new-gem-content').value;
-
-    fetch('/add-new-gem', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        vaultTitle: '{{vault.title}}',
-        newGemTitle: newGemTitle,
-        newGemContent: newGemContent
-      })
+  fetch('/add-new-gem', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      vaultTitle: '{{vault.title}}',
+      newGemTitle: newGemTitle,
+      newGemContent: newGemContent
     })
-    .then(response => {
+  })
+  .then(response => {
+    if (response.ok) {
+      // Create and append the new gem card
+      const containerFlex = document.getElementById('gemcards');
 
       // Create card
       const card = document.createElement('div');
-      card.id = 'card' + getIdTitle(newGemTitle);
+      card.id = `card${getIdTitle(newGemTitle)}`;
       card.classList.add('card', 'm-2');
-      card.style.flex = "0 0 calc(25% - 2rem)";
-      card.style.maxWidth = "calc(25% - 2rem)";
+      card.style.flex = '0 0 calc(25% - 2rem)';
+      card.style.maxWidth = 'calc(25% - 2rem)';
 
       // Create header
       const header = document.createElement('div');
@@ -335,114 +340,18 @@ addButton.addEventListener('click', () => {
       nav.style.padding = 0;
 
       // Create button group
-      const btnGroup = document.createElement('div');
-      btnGroup.classList.add('btn-group');
-      btnGroup.setAttribute('role', 'group');
-      btnGroup.setAttribute('aria-label', 'Basic example');
-
-      // Add buttons
-      const copyBtn = document.createElement('button');
-      copyBtn.classList.add('btn', 'btn-primary');
-      copyBtn.textContent = 'Copy';
-
-      const editBtn = copyBtn.cloneNode(true);
-      editBtn.textContent = 'Edit';
-
-      const tagsBtn = copyBtn.cloneNode(true);
-      tagsBtn.textContent = 'Tags';
-
-      btnGroup.appendChild(copyBtn);
-      btnGroup.appendChild(editBtn);
-      btnGroup.appendChild(tagsBtn);
-
-        // Create delete modal
-        const deleteModal = document.createElement('div');
-        deleteModal.classList.add('modal', 'fade');
-        deleteModal.id = `deleteModal${getIdTitle(newGemTitle)}`;
-        deleteModal.setAttribute('tabindex', '-1');
-        deleteModal.setAttribute('aria-labelledby', 'deleteModalLabel');
-        deleteModal.setAttribute('aria-hidden', 'true');
-
-        // Create modal dialog
-        const modalDialog = document.createElement('div');
-        modalDialog.classList.add('modal-dialog');
-
-        // Create modal content
-        const modalContent = document.createElement('div');
-        modalContent.classList.add('modal-content');
-
-        // Create modal header
-        const modalHeader = document.createElement('div');
-        modalHeader.classList.add('modal-header');
-
-        // Create modal title
-        const modalTitle = document.createElement('h5');
-        modalTitle.classList.add('modal-title');
-        modalTitle.id = 'deleteModalLabel';
-        modalTitle.textContent = 'Confirm Delete';
-
-        // Create close button
-        const closeButton = document.createElement('button');
-        closeButton.classList.add('btn-close');
-        closeButton.setAttribute('data-bs-dismiss', 'modal');
-        closeButton.setAttribute('aria-label', 'Close');
-
-        // Add elements to header
-        modalHeader.appendChild(modalTitle);
-        modalHeader.appendChild(closeButton);
-
-        // Create modal body
-        const modalBody = document.createElement('div');
-        modalBody.classList.add('modal-body');
-        modalBody.innerHTML = `
-          Are you sure you want to delete <strong>${newGemTitle}</strong>? This action cannot be undone.
-        `;
-
-        // Create footer buttons
-        const modalFooter = document.createElement('div');
-        modalFooter.classList.add('modal-footer');
-
-        const cancelBtn = document.createElement('button');
-        cancelBtn.classList.add('btn', 'btn-secondary');
-        cancelBtn.setAttribute('data-bs-dismiss', 'modal');
-        cancelBtn.textContent = 'Cancel';
-
-        const confirmBtn = document.createElement('button');
-        confirmBtn.classList.add('btn', 'btn-danger');
-        confirmBtn.textContent = 'Delete';
-        confirmBtn.setAttribute('data-bs-dismiss', 'modal');
-        confirmBtn.addEventListener('click', () => {confirmDeleteGem(newGemTitle)});
-
-        modalFooter.appendChild(cancelBtn);
-        modalFooter.appendChild(confirmBtn);
-
-        // Add elements to modal
-        modalContent.appendChild(modalHeader);
-        modalContent.appendChild(modalBody);
-        modalContent.appendChild(modalFooter);
-
-        modalDialog.appendChild(modalContent);
-
-        deleteModal.appendChild(modalDialog);
-
-        // Append modal
-        document.body.appendChild(deleteModal);
+      const btnGroup = document.createElement('button');
+      btnGroup.classList.add('btn', 'btn-primary', 'btn-sm');
+      btnGroup.setAttribute('data-bs-toggle', 'modal');
+      btnGroup.setAttribute('data-bs-target', `#openModal${getIdTitle(newGemTitle)}`);
+      btnGroup.textContent = 'Open';
 
       // Create delete button
       const deleteBtn = document.createElement('button');
       deleteBtn.classList.add('btn', 'btn-danger', 'btn-sm');
+      deleteBtn.setAttribute('data-bs-toggle', 'modal');
+      deleteBtn.setAttribute('data-bs-target', `#deleteModal${getIdTitle(newGemTitle)}`);
       deleteBtn.textContent = 'Delete';
-      deleteBtn.addEventListener('click', () => {
-
-          // Get modal
-          const modal = document.getElementById(`deleteModal${getIdTitle(newGemTitle)}`);
-
-          // Initialize and show modal
-          const myModal = new bootstrap.Modal(modal);
-          myModal.show();
-
-        });
-
 
       // Add elements to nav
       nav.appendChild(btnGroup);
@@ -454,37 +363,192 @@ addButton.addEventListener('click', () => {
       // Add header to card
       card.appendChild(header);
 
-    // Create card body
-        const body = document.createElement('div');
-        body.classList.add('card-body');
+      // Create card body
+      const body = document.createElement('div');
+      body.classList.add('card-body');
 
-        // Create title
-        const title = document.createElement('h5');
-        title.classList.add('card-title');
-        title.textContent = newGemTitle;
+      // Create title
+      const title = document.createElement('h5');
+      title.classList.add('card-title');
+      title.textContent = newGemTitle;
 
-        // Create preview text
-        const preview = document.createElement('p');
-        preview.classList.add('card-text');
-        preview.textContent = newGemContent;
+      // Create preview text
+      const preview = document.createElement('p');
+      preview.classList.add('card-text');
+      preview.id = `preview${getIdTitle(newGemTitle)}`;
+      preview.textContent = newGemContent;
 
-        // Add elements to body
-        body.appendChild(title);
-        body.appendChild(preview);
+      // Add elements to body
+      body.appendChild(title);
+      body.appendChild(preview);
 
-        // Add body to card
-        card.appendChild(body);
+      // Add body to card
+      card.appendChild(body);
 
-          // Append new card
-          document.querySelector('.container-flex').appendChild(card);
+      // Create open modal
+      const openModal = document.createElement('div');
+      openModal.classList.add('modal', 'fade');
+      openModal.id = `openModal${getIdTitle(newGemTitle)}`;
+      openModal.setAttribute('tabindex', '-1');
+      openModal.setAttribute('aria-labelledby', 'deleteModalLabel');
+      openModal.setAttribute('aria-hidden', 'true');
 
-        gemTitle.value = "";
-        gemContent.value = "";
-    })
-    .catch(error => {
-      console.log('Error:', error);
-    });
+      // Create open modal dialog
+      const openModalDialog = document.createElement('div');
+      openModalDialog.classList.add('modal-dialog');
+
+      // Create open modal content
+      const openModalContent = document.createElement('div');
+      openModalContent.classList.add('modal-content');
+
+      // Create open modal header
+      const openModalHeader = document.createElement('div');
+      openModalHeader.classList.add('modal-header');
+
+      // Create open modal title
+      const openModalTitle = document.createElement('h5');
+      openModalTitle.classList.add('modal-title');
+      openModalTitle.id = 'openModalLabel1';
+      openModalTitle.textContent = newGemTitle;
+
+      // Create open modal close button
+      const openModalCloseButton = document.createElement('button');
+      openModalCloseButton.classList.add('btn-close');
+      openModalCloseButton.setAttribute('data-bs-dismiss', 'modal');
+      openModalCloseButton.setAttribute('aria-label', 'Close');
+
+      // Append elements to open modal header
+      openModalHeader.appendChild(openModalTitle);
+      openModalHeader.appendChild(openModalCloseButton);
+
+      // Create open modal body
+      const openModalBody = document.createElement('div');
+      openModalBody.classList.add('modal-body');
+
+      // Create open modal content textarea
+      const openModalTextarea = document.createElement('textarea');
+      openModalTextarea.classList.add('form-control');
+      openModalTextarea.id = `content${getIdTitle(newGemTitle)}`;
+      openModalTextarea.value = newGemContent;
+
+      // Append textarea to open modal body
+      openModalBody.appendChild(openModalTextarea);
+
+      // Create open modal footer
+      const openModalFooter = document.createElement('div');
+      openModalFooter.classList.add('modal-footer');
+
+      // Create open modal save button
+      const openModalSaveButton = document.createElement('button');
+      openModalSaveButton.classList.add('btn', 'btn-primary');
+      openModalSaveButton.setAttribute('data-bs-dismiss', 'modal');
+      openModalSaveButton.id = `update${getIdTitle(newGemTitle)}`;
+      openModalSaveButton.setAttribute('onclick', `saveGemContent('${newGemTitle}', '{{user}}')`);
+      openModalSaveButton.textContent = 'Save Changes';
+
+      // Append save button to open modal footer
+      openModalFooter.appendChild(openModalSaveButton);
+
+      // Append elements to open modal content
+      openModalContent.appendChild(openModalHeader);
+      openModalContent.appendChild(openModalBody);
+      openModalContent.appendChild(openModalFooter);
+
+      // Append open modal content to open modal dialog
+      openModalDialog.appendChild(openModalContent);
+
+      // Append open modal dialog to open modal
+      openModal.appendChild(openModalDialog);
+
+      // Create delete modal
+      const deleteModal = document.createElement('div');
+      deleteModal.classList.add('modal', 'fade');
+      deleteModal.id = `deleteModal${getIdTitle(newGemTitle)}`;
+      deleteModal.setAttribute('tabindex', '-1');
+      deleteModal.setAttribute('aria-labelledby', 'deleteModalLabel');
+      deleteModal.setAttribute('aria-hidden', 'true');
+
+      // Create delete modal dialog
+      const deleteModalDialog = document.createElement('div');
+      deleteModalDialog.classList.add('modal-dialog');
+
+      // Create delete modal content
+      const deleteModalContent = document.createElement('div');
+      deleteModalContent.classList.add('modal-content');
+
+      // Create delete modal header
+      const deleteModalHeader = document.createElement('div');
+      deleteModalHeader.classList.add('modal-header');
+
+      // Create delete modal title
+      const deleteModalTitle = document.createElement('h5');
+      deleteModalTitle.classList.add('modal-title');
+      deleteModalTitle.id = 'deleteModalLabel1';
+      deleteModalTitle.textContent = 'Confirm Delete';
+
+      // Create delete modal close button
+      const deleteModalCloseButton = document.createElement('button');
+      deleteModalCloseButton.classList.add('btn-close');
+      deleteModalCloseButton.setAttribute('data-bs-dismiss', 'modal');
+      deleteModalCloseButton.setAttribute('aria-label', 'Close');
+
+      // Append elements to delete modal header
+      deleteModalHeader.appendChild(deleteModalTitle);
+      deleteModalHeader.appendChild(deleteModalCloseButton);
+
+      // Create delete modal body
+      const deleteModalBody = document.createElement('div');
+      deleteModalBody.classList.add('modal-body');
+      deleteModalBody.innerHTML = `Are you sure you want to delete <strong>${newGemTitle}</strong>? This action cannot be undone.`;
+
+// Create delete modal footer
+const deleteModalFooter = document.createElement('div');
+deleteModalFooter.classList.add('modal-footer');
+
+// Create delete modal cancel button
+const deleteModalCancelButton = document.createElement('button');
+deleteModalCancelButton.classList.add('btn', 'btn-secondary');
+deleteModalCancelButton.setAttribute('data-bs-dismiss', 'modal');
+deleteModalCancelButton.textContent = 'Cancel';
+
+// Create delete modal confirm button
+const deleteModalConfirmButton = document.createElement('button');
+deleteModalConfirmButton.classList.add('btn', 'btn-danger');
+deleteModalConfirmButton.setAttribute('data-bs-dismiss', 'modal');
+deleteModalConfirmButton.setAttribute('onclick', `confirmDeleteGem('${newGemTitle}')`);
+deleteModalConfirmButton.textContent = 'Delete';
+
+// Append buttons to delete modal footer
+deleteModalFooter.appendChild(deleteModalCancelButton);
+deleteModalFooter.appendChild(deleteModalConfirmButton);
+
+// Append elements to delete modal content
+deleteModalContent.appendChild(deleteModalHeader);
+deleteModalContent.appendChild(deleteModalBody);
+deleteModalContent.appendChild(deleteModalFooter);
+
+// Append delete modal content to delete modal dialog
+deleteModalDialog.appendChild(deleteModalContent);
+
+// Append delete modal dialog to delete modal
+deleteModal.appendChild(deleteModalDialog);
+
+// Append new card and modals
+containerFlex.appendChild(card);
+document.body.appendChild(openModal);
+document.body.appendChild(deleteModal);
+
+// Clear the input fields
+document.getElementById('new-gem-title').value = '';
+document.getElementById('new-gem-content').value = '';
+    } else {
+      console.error('Error adding new gem:', response.status);
+    }
+  })
+  .catch(error => {
+    console.log('Error:', error);
   });
+});
 </script>
 <script id="orgainzation-needed">
 

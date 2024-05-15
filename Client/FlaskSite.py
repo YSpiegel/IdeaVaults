@@ -70,7 +70,7 @@ def get_vault_gems(vault):
     client_socket = open_con("get-gems-by-vault", vault)
     gem = util.flipbase(client_socket.recv(1024), 'd')
     gems = []
-    while gem != b"@":
+    while gem != "@":
         gems.append(gem)
         client_socket.send("next".encode())
         gem = util.flipbase(client_socket.recv(1024), 'd')
@@ -97,6 +97,12 @@ def home():
     if user:
         return redirect(url_for('dashboard'))
     return render_template("home.html")
+
+
+@app.route('/about')
+def about():
+    user = get_user()
+    return render_template("home.html", user=user)
 
 
 @app.route('/connect', methods=['GET', 'POST'])
@@ -242,12 +248,6 @@ def vault_page(type, vault):
     return redirect(url_for('no_access', user=user, title=vault.title))
 
 
-@app.route('/no-access/<user>/<title>')
-def no_access(user, title):
-    vault = get_vault(title)
-    return render_template('no-access.html', user=user, vault=vault)
-
-
 @app.route('/update-description', methods=['POST'])
 def update_description():
     data = request.get_json()
@@ -284,7 +284,7 @@ def add_new_gem():
 
     client_socket = open_con("add-gem-to-vault", (user, vault_title, new_gem_title, new_gem_content))
     client_socket.close()
-
+    print('returning 200')
     return '', 200
 
 

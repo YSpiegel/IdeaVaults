@@ -76,9 +76,6 @@ class Gem:
             self.lastedit = lastedit
         self.preview = string_preview(self.content, 14, 21)
 
-    def __str__(self):
-        return f"{self.vault}|||{self.user}|||{self.title}|||{self.content}"
-
 
 class Utils:
     def __init__(self):
@@ -156,6 +153,6 @@ class Utils:
 
 if __name__ == "__main__":
     util = Utils()
-    encrypted = util.flipbase(pickle.dumps((8, 9)), 'encrypt')
+    encrypted = util.flipbase('@', 'e')
     print(encrypted)
-    print(util.flipbase(encrypted, 'decrypt'))
+    print(util.flipbase(encrypted, 'd'))

@@ -3,6 +3,67 @@
 {% block title %}{% endblock %}
 
 {% block content %}
+<style>
+        .container {
+            width: 80%;
+            margin: auto;
+            padding: 5px;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+        .container h1, .container h2 {
+            text-align: center;
+        }
+        .container p {
+            margin-bottom: 20px;
+        }
+        .container ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .container li {
+            margin-bottom: 10px;
+        }
+        .features {
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+        .call-to-action {
+            text-align: center;
+            margin-top: 40px;
+        }
+    </style>
+<div class="container">
+        <header>
+            <h1>Welcome to IdeaVaults - Your Secure Note Taking Solution</h1>
+        </header>
 
+        <section>
+            <p>IdeaVaults is your digital fortress for securely storing all your notes, ideas, and thoughts. With end-to-end encryption and robust security features, your information is always safe and accessible only to you.</p>
+        </section>
+
+        <section class="features">
+            <h2>Features</h2>
+            <ul>
+                <li><strong>End-to-End Encryption:</strong> Your notes are encrypted from the moment you create them, ensuring that only you can access them.</li>
+                <li><strong>Organize and Search:</strong> Keep your notes organized with specific vaults for each project.</li>
+                <li><strong>Collaborate Securely:</strong> Share notes securely with colleagues or friends while maintaining control over who can access them.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Why Choose IdeaVaults?</h2>
+            <ul>
+                <li><strong>Privacy First:</strong> We prioritize your privacy and security above all else, ensuring that your data remains confidential.</li>
+                <li><strong>User-Friendly Interface:</strong> Our intuitive interface makes it easy to create, organize, and access your notes with ease.</li>
+            </ul>
+        </section>
+
+        <section class="call-to-action">
+            <h2>Get Started Today</h2>
+            <p>Join thousands of users who trust IdeaVaults to keep their notes safe and secure. Sign up now for your free account and take control of your ideas.</p>
+            <p><em>Your ideas are precious. Keep them safe with IdeaVaults.</em></p>
+        </section>
+    </div>
 
 {% endblock %}
